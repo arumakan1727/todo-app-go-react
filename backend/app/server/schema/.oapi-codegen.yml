@@ -1,0 +1,11 @@
+# available config options: https://github.com/deepmap/oapi-codegen/blob/master/pkg/codegen/configuration.go
+package: schema
+output: schema.gen.go
+generate:
+  models: true
+  embedded-spec: true
+compatibility:
+  always-prefix-enum-values: true
+additional-imports: []
+output-options:
+  skip-prune: true

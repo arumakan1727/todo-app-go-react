@@ -1,0 +1,12 @@
+# available config options: https://github.com/deepmap/oapi-codegen/blob/master/pkg/codegen/configuration.go
+package: server
+output: interface.gen.go
+generate:
+  echo-server: true
+compatibility:
+  always-prefix-enum-values: true
+additional-imports:
+  - package: "github.com/arumakan1727/todo-app-go-react/app/server/schema"
+    alias: "."
+output-options:
+  skip-prune: true
