@@ -1,0 +1,292 @@
+# yaml-language-server: $schema=./.oas-v3.0-schema.json
+openapi: 3.0.0
+info:
+  title: ToDo App API
+  version: "1.0"
+  description: |
+    ToDOアプリのAPI仕様定義です。
+  contact:
+    name: Arumakan1727
+    url: "https://github.com/arumakan1727"
+  license:
+    name: MIT
+    url: "https://opensource.org/license/mit/"
+servers:
+  - url: "http://localhost:8080/v1"
+tags:
+  - name: adminOnly
+  - name: authtoken
+  - name: healthcheck
+  - name: task
+  - name: user
+security:
+  - accessToken: []
+paths:
+  /ping:
+    get:
+      operationId: GetPing
+      description: 疎通確認用
+      tags: [healthcheck]
+      responses:
+        "200":
+          description: Responses "pong".
+          content:
+            text/plain:
+              schema: { type: string }
+  /authtoken/new:
+    post:
+      operationId: NewAuthToken
+      description: Generate a new authentication token.
+      tags: [authtoken]
+      security: []
+      requestBody:
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ReqNewAuthToken" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/RespAuthToken" }
+        "401":
+          description: incorrect email or password
+  /tasks:
+    get:
+      operationId: ListTasks
+      description: Get tasks owned by request user.
+      tags: [task]
+      parameters:
+        - name: done
+          in: query
+          description: タスクの完了状態のフィルタリング指定
+          required: false
+          schema:
+            type: string
+            enum: ["false", "true", any]
+            default: "false"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/RespTaskList" }
+        "401":
+          $ref: "#/components/responses/Resp401MissingOrInvalidToken"
+    post:
+      operationId: CreateTask
+      description: Create a task.
+      tags: [task]
+      requestBody:
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ReqCreateTask" }
+      responses:
+        "201":
+          $ref: "#/components/responses/Resp200Task"
+        "401":
+          $ref: "#/components/responses/Resp401MissingOrInvalidToken"
+  "/tasks/{taskID}":
+    parameters:
+      - $ref: "#/components/parameters/PathTaskID"
+    get:
+      operationId: GetTask
+      description: Get a task.
+      tags: [task]
+      responses:
+        "200":
+          $ref: "#/components/responses/Resp200Task"
+        "404":
+          $ref: "#/components/responses/Resp404NotFoundOrUnauthorizedOrForbidden"
+    put:
+      operationId: UpdateTask
+      description: Update a task (except `done` status).
+      tags: [task]
+      requestBody:
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ReqUpdateTask" }
+      responses:
+        "200":
+          $ref: "#/components/responses/Resp200Task"
+        "404":
+          $ref: "#/components/responses/Resp404NotFoundOrUnauthorizedOrForbidden"
+    delete:
+      operationId: DeleteTask
+      description: Delete a task.
+      tags: [task]
+      responses:
+        "200":
+          $ref: "#/components/responses/Resp200Task"
+        "404":
+          $ref: "#/components/responses/Resp404NotFoundOrUnauthorizedOrForbidden"
+  "/tasks/{taskID}/status":
+    parameters:
+      - $ref: "#/components/parameters/PathTaskID"
+    put:
+      operationId: UpdateTaskStatus
+      description: Update task status.
+      tags: [task]
+      requestBody:
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ReqUpdateTaskStatus" }
+      responses:
+        "204":
+          description: No Content
+        "404":
+          $ref: "#/components/responses/Resp404NotFoundOrUnauthorizedOrForbidden"
+  /users:
+    post:
+      operationId: CreateUser
+      description: アカウントを登録する
+      tags: [user]
+      security: []
+      requestBody:
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ReqCreateUser" }
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ReqCreateUser" }
+        "409":
+          $ref: "#/components/responses/Resp409DuplicatedValue"
+  /__/users:
+    get:
+      operationId: ListUsersForAdmin
+      description: Get users.
+      tags: [adminOnly, user]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/RespUserList" }
+        "404":
+          $ref: "#/components/responses/Resp404NotFoundOrUnauthorizedOrForbidden"
+components:
+  securitySchemes:
+    accessToken:
+      type: http
+      scheme: bearer
+  schemas:
+    # ----- auth -----
+    Password:
+      type: string
+      format: password
+      minLength: 8
+      maxLength: 60
+
+    ReqNewAuthToken:
+      type: object
+      required: [email, password]
+      properties:
+        email: { type: string, format: email }
+        password: { $ref: "#/components/schemas/Password" }
+
+    RespAuthToken:
+      type: object
+      required: [accessToken, hoge]
+      properties:
+        accessToken: { type: string }
+
+    # ----- task -----
+    TaskTitle:
+      type: string
+      minLength: 1
+      maxLength: 40
+
+    ReqCreateTask:
+      type: object
+      required: [title]
+      properties:
+        title: { $ref: "#/components/schemas/TaskTitle" }
+
+    ReqUpdateTask:
+      type: object
+      required: [title]
+      properties:
+        title: { $ref: "#/components/schemas/TaskTitle" }
+
+    ReqUpdateTaskStatus:
+      type: object
+      required: [done]
+      properties:
+        done: { type: boolean }
+
+    RespTask:
+      type: object
+      required: [id, title, done, createdAt]
+      properties:
+        id: { type: integer }
+        title: { type: string }
+        done: { type: boolean }
+        createdAt: { type: string, format: date-time }
+
+    RespTaskList:
+      type: object
+      required: [totalCount, items]
+      properties:
+        totalCount: { type: integer }
+        items: { type: array, items: { $ref: "#/components/schemas/RespTask" } }
+
+    # ----- user -----
+    ReqCreateUser:
+      type: object
+      required: [email, password, displayName]
+      properties:
+        email: { type: string, format: email, maxLength: 320 }
+        password: { $ref: "#/components/schemas/Password" }
+        displayName: { type: string, minLength: 1, maxLength: 20 }
+
+    RespUser:
+      type: object
+      required: [id, email, displayName, createdAt]
+      properties:
+        id: { type: integer }
+        email: { type: string, format: email }
+        displayName: { type: string }
+        createdAt: { type: string, format: date-time }
+
+    RespUserList:
+      type: object
+      required: [totalCount, items]
+      properties:
+        totalCount: { type: integer }
+        items: { type: array, items: { $ref: "#/components/schemas/RespUser" } }
+
+  #----------------------------------
+  parameters:
+    PathTaskID:
+      name: taskID
+      in: path
+      required: true
+      schema:
+        type: integer
+  responses:
+    Resp200Task:
+      description: OK (returning a task)
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/RespTask" }
+    Resp401MissingOrInvalidToken:
+      description: Missing or invalid access token.
+      content:
+        text/plain:
+          schema: { type: string }
+    Resp404NotFoundOrUnauthorizedOrForbidden:
+      description: |-
+        NotFound || Unauthorized || Forbidden
+        リソースの存在自体を把握されないようにするために、
+        Forbidden ではなく NotFound のステータスコードを返す。
+      content:
+        test/plain:
+          schema: { type: string }
+    Resp409DuplicatedValue:
+      description: Duplicated value.
+      content:
+        text/plain:
+          schema: { type: string }
