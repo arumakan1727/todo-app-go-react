@@ -82,7 +82,7 @@ paths:
           application/json:
             schema: { $ref: "#/components/schemas/ReqCreateTask" }
       responses:
-        "201":
+        "200":
           $ref: "#/components/responses/Resp200Task"
         "401":
           $ref: "#/components/responses/Resp401MissingOrInvalidToken"
@@ -147,7 +147,7 @@ paths:
           application/json:
             schema: { $ref: "#/components/schemas/ReqCreateUser" }
       responses:
-        "201":
+        "200":
           description: Created
           content:
             application/json:
