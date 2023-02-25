@@ -48,7 +48,7 @@ paths:
           description: OK
           content:
             application/json:
-              schema: { $ref: "#/components/schemas/RespAuthToken" }
+              schema: { $ref: "#/components/schemas/AuthToken" }
         "401":
           description: incorrect email or password
   /tasks:
@@ -164,7 +164,7 @@ paths:
           description: OK
           content:
             application/json:
-              schema: { $ref: "#/components/schemas/RespUserList" }
+              schema: { $ref: "#/components/schemas/UserList" }
         "404":
           $ref: "#/components/responses/Resp404NotFoundOrUnauthorizedOrForbidden"
 components:
@@ -187,7 +187,7 @@ components:
         email: { type: string, format: email }
         password: { $ref: "#/components/schemas/Password" }
 
-    RespAuthToken:
+    AuthToken:
       type: object
       required: [accessToken, hoge]
       properties:
@@ -242,7 +242,7 @@ components:
         password: { $ref: "#/components/schemas/Password" }
         displayName: { type: string, minLength: 1, maxLength: 20 }
 
-    RespUser:
+    User:
       type: object
       required: [id, email, displayName, createdAt]
       properties:
@@ -251,12 +251,12 @@ components:
         displayName: { type: string }
         createdAt: { type: string, format: date-time }
 
-    RespUserList:
+    UserList:
       type: object
       required: [totalCount, items]
       properties:
         totalCount: { type: integer }
-        items: { type: array, items: { $ref: "#/components/schemas/RespUser" } }
+        items: { type: array, items: { $ref: "#/components/schemas/User" } }
 
   #----------------------------------
   parameters:
