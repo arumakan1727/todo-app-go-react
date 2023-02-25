@@ -35,14 +35,14 @@ paths:
               schema: { type: string }
   /authtoken/new:
     post:
-      operationId: NewAuthToken
+      operationId: CreateAuthToken
       description: Generate a new authentication token.
       tags: [authtoken]
       security: []
       requestBody:
         content:
           application/json:
-            schema: { $ref: "#/components/schemas/ReqNewAuthToken" }
+            schema: { $ref: "#/components/schemas/ReqCreateAuthToken" }
       responses:
         "200":
           description: OK
@@ -70,7 +70,7 @@ paths:
           description: OK
           content:
             application/json:
-              schema: { $ref: "#/components/schemas/RespTaskList" }
+              schema: { $ref: "#/components/schemas/TaskList" }
         "401":
           $ref: "#/components/responses/Resp401MissingOrInvalidToken"
     post:
@@ -88,7 +88,7 @@ paths:
           $ref: "#/components/responses/Resp401MissingOrInvalidToken"
   "/tasks/{taskID}":
     parameters:
-      - $ref: "#/components/parameters/PathTaskID"
+      - $ref: "#/components/parameters/TaskID"
     get:
       operationId: GetTask
       description: Get a task.
@@ -98,14 +98,14 @@ paths:
           $ref: "#/components/responses/Resp200Task"
         "404":
           $ref: "#/components/responses/Resp404NotFoundOrUnauthorizedOrForbidden"
-    put:
-      operationId: UpdateTask
-      description: Update a task (except `done` status).
+    patch:
+      operationId: PatchTask
+      description: Patch a task
       tags: [task]
       requestBody:
         content:
           application/json:
-            schema: { $ref: "#/components/schemas/ReqUpdateTask" }
+            schema: { $ref: "#/components/schemas/ReqPatchTask" }
       responses:
         "200":
           $ref: "#/components/responses/Resp200Task"
@@ -117,23 +117,10 @@ paths:
       tags: [task]
       responses:
         "200":
-          $ref: "#/components/responses/Resp200Task"
-        "404":
-          $ref: "#/components/responses/Resp404NotFoundOrUnauthorizedOrForbidden"
-  "/tasks/{taskID}/status":
-    parameters:
-      - $ref: "#/components/parameters/PathTaskID"
-    put:
-      operationId: UpdateTaskStatus
-      description: Update task status.
-      tags: [task]
-      requestBody:
-        content:
-          application/json:
-            schema: { $ref: "#/components/schemas/ReqUpdateTaskStatus" }
-      responses:
-        "204":
-          description: No Content
+          description: Deleted
+          content:
+            text/plain:
+              schema: { type: string }
         "404":
           $ref: "#/components/responses/Resp404NotFoundOrUnauthorizedOrForbidden"
   /users:
@@ -180,7 +167,7 @@ components:
       minLength: 8
       maxLength: 60
 
-    ReqNewAuthToken:
+    ReqCreateAuthToken:
       type: object
       required: [email, password]
       properties:
@@ -205,19 +192,13 @@ components:
       properties:
         title: { $ref: "#/components/schemas/TaskTitle" }
 
-    ReqUpdateTask:
+    ReqPatchTask:
       type: object
-      required: [title]
       properties:
         title: { $ref: "#/components/schemas/TaskTitle" }
-
-    ReqUpdateTaskStatus:
-      type: object
-      required: [done]
-      properties:
         done: { type: boolean }
 
-    RespTask:
+    Task:
       type: object
       required: [id, title, done, createdAt]
       properties:
@@ -226,12 +207,12 @@ components:
         done: { type: boolean }
         createdAt: { type: string, format: date-time }
 
-    RespTaskList:
+    TaskList:
       type: object
       required: [totalCount, items]
       properties:
         totalCount: { type: integer }
-        items: { type: array, items: { $ref: "#/components/schemas/RespTask" } }
+        items: { type: array, items: { $ref: "#/components/schemas/Task" } }
 
     # ----- user -----
     ReqCreateUser:
@@ -260,7 +241,7 @@ components:
 
   #----------------------------------
   parameters:
-    PathTaskID:
+    TaskID:
       name: taskID
       in: path
       required: true
@@ -271,7 +252,7 @@ components:
       description: OK (returning a task)
       content:
         application/json:
-          schema: { $ref: "#/components/schemas/RespTask" }
+          schema: { $ref: "#/components/schemas/Task" }
     Resp401MissingOrInvalidToken:
       description: Missing or invalid access token.
       content:

@@ -28,6 +28,12 @@ type AuthToken struct {
 // Password defines model for Password.
 type Password = string
 
+// ReqCreateAuthToken defines model for ReqCreateAuthToken.
+type ReqCreateAuthToken struct {
+	Email    openapi_types.Email `json:"email"`
+	Password Password            `json:"password"`
+}
+
 // ReqCreateTask defines model for ReqCreateTask.
 type ReqCreateTask struct {
 	Title TaskTitle `json:"title"`
@@ -40,34 +46,24 @@ type ReqCreateUser struct {
 	Password    Password            `json:"password"`
 }
 
-// ReqNewAuthToken defines model for ReqNewAuthToken.
-type ReqNewAuthToken struct {
-	Email    openapi_types.Email `json:"email"`
-	Password Password            `json:"password"`
+// ReqPatchTask defines model for ReqPatchTask.
+type ReqPatchTask struct {
+	Done  *bool      `json:"done,omitempty"`
+	Title *TaskTitle `json:"title,omitempty"`
 }
 
-// ReqUpdateTask defines model for ReqUpdateTask.
-type ReqUpdateTask struct {
-	Title TaskTitle `json:"title"`
-}
-
-// ReqUpdateTaskStatus defines model for ReqUpdateTaskStatus.
-type ReqUpdateTaskStatus struct {
-	Done bool `json:"done"`
-}
-
-// RespTask defines model for RespTask.
-type RespTask struct {
+// Task defines model for Task.
+type Task struct {
 	CreatedAt time.Time `json:"createdAt"`
 	Done      bool      `json:"done"`
 	Id        int       `json:"id"`
 	Title     string    `json:"title"`
 }
 
-// RespTaskList defines model for RespTaskList.
-type RespTaskList struct {
-	Items      []RespTask `json:"items"`
-	TotalCount int        `json:"totalCount"`
+// TaskList defines model for TaskList.
+type TaskList struct {
+	Items      []Task `json:"items"`
+	TotalCount int    `json:"totalCount"`
 }
 
 // TaskTitle defines model for TaskTitle.
@@ -87,11 +83,11 @@ type UserList struct {
 	TotalCount int    `json:"totalCount"`
 }
 
-// PathTaskID defines model for PathTaskID.
-type PathTaskID = int
+// TaskID defines model for TaskID.
+type TaskID = int
 
 // Resp200Task defines model for Resp200Task.
-type Resp200Task = RespTask
+type Resp200Task = Task
 
 // ListTasksParams defines parameters for ListTasks.
 type ListTasksParams struct {
@@ -102,17 +98,14 @@ type ListTasksParams struct {
 // ListTasksParamsDone defines parameters for ListTasks.
 type ListTasksParamsDone string
 
-// NewAuthTokenJSONRequestBody defines body for NewAuthToken for application/json ContentType.
-type NewAuthTokenJSONRequestBody = ReqNewAuthToken
+// CreateAuthTokenJSONRequestBody defines body for CreateAuthToken for application/json ContentType.
+type CreateAuthTokenJSONRequestBody = ReqCreateAuthToken
 
 // CreateTaskJSONRequestBody defines body for CreateTask for application/json ContentType.
 type CreateTaskJSONRequestBody = ReqCreateTask
 
-// UpdateTaskJSONRequestBody defines body for UpdateTask for application/json ContentType.
-type UpdateTaskJSONRequestBody = ReqUpdateTask
-
-// UpdateTaskStatusJSONRequestBody defines body for UpdateTaskStatus for application/json ContentType.
-type UpdateTaskStatusJSONRequestBody = ReqUpdateTaskStatus
+// PatchTaskJSONRequestBody defines body for PatchTask for application/json ContentType.
+type PatchTaskJSONRequestBody = ReqPatchTask
 
 // CreateUserJSONRequestBody defines body for CreateUser for application/json ContentType.
 type CreateUserJSONRequestBody = ReqCreateUser

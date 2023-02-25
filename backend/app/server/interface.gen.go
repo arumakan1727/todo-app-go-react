@@ -19,7 +19,7 @@ type ServerInterface interface {
 	ListUsersForAdmin(ctx echo.Context) error
 
 	// (POST /authtoken/new)
-	NewAuthToken(ctx echo.Context) error
+	CreateAuthToken(ctx echo.Context) error
 
 	// (GET /ping)
 	GetPing(ctx echo.Context) error
@@ -31,16 +31,13 @@ type ServerInterface interface {
 	CreateTask(ctx echo.Context) error
 
 	// (DELETE /tasks/{taskID})
-	DeleteTask(ctx echo.Context, taskID PathTaskID) error
+	DeleteTask(ctx echo.Context, taskID TaskID) error
 
 	// (GET /tasks/{taskID})
-	GetTask(ctx echo.Context, taskID PathTaskID) error
+	GetTask(ctx echo.Context, taskID TaskID) error
 
-	// (PUT /tasks/{taskID})
-	UpdateTask(ctx echo.Context, taskID PathTaskID) error
-
-	// (PUT /tasks/{taskID}/status)
-	UpdateTaskStatus(ctx echo.Context, taskID PathTaskID) error
+	// (PATCH /tasks/{taskID})
+	PatchTask(ctx echo.Context, taskID TaskID) error
 
 	// (POST /users)
 	CreateUser(ctx echo.Context) error
@@ -62,12 +59,12 @@ func (w *ServerInterfaceWrapper) ListUsersForAdmin(ctx echo.Context) error {
 	return err
 }
 
-// NewAuthToken converts echo context to params.
-func (w *ServerInterfaceWrapper) NewAuthToken(ctx echo.Context) error {
+// CreateAuthToken converts echo context to params.
+func (w *ServerInterfaceWrapper) CreateAuthToken(ctx echo.Context) error {
 	var err error
 
 	// Invoke the callback with all the unmarshalled arguments
-	err = w.Handler.NewAuthToken(ctx)
+	err = w.Handler.CreateAuthToken(ctx)
 	return err
 }
 
@@ -117,7 +114,7 @@ func (w *ServerInterfaceWrapper) CreateTask(ctx echo.Context) error {
 func (w *ServerInterfaceWrapper) DeleteTask(ctx echo.Context) error {
 	var err error
 	// ------------- Path parameter "taskID" -------------
-	var taskID PathTaskID
+	var taskID TaskID
 
 	err = runtime.BindStyledParameterWithLocation("simple", false, "taskID", runtime.ParamLocationPath, ctx.Param("taskID"), &taskID)
 	if err != nil {
@@ -135,7 +132,7 @@ func (w *ServerInterfaceWrapper) DeleteTask(ctx echo.Context) error {
 func (w *ServerInterfaceWrapper) GetTask(ctx echo.Context) error {
 	var err error
 	// ------------- Path parameter "taskID" -------------
-	var taskID PathTaskID
+	var taskID TaskID
 
 	err = runtime.BindStyledParameterWithLocation("simple", false, "taskID", runtime.ParamLocationPath, ctx.Param("taskID"), &taskID)
 	if err != nil {
@@ -149,11 +146,11 @@ func (w *ServerInterfaceWrapper) GetTask(ctx echo.Context) error {
 	return err
 }
 
-// UpdateTask converts echo context to params.
-func (w *ServerInterfaceWrapper) UpdateTask(ctx echo.Context) error {
+// PatchTask converts echo context to params.
+func (w *ServerInterfaceWrapper) PatchTask(ctx echo.Context) error {
 	var err error
 	// ------------- Path parameter "taskID" -------------
-	var taskID PathTaskID
+	var taskID TaskID
 
 	err = runtime.BindStyledParameterWithLocation("simple", false, "taskID", runtime.ParamLocationPath, ctx.Param("taskID"), &taskID)
 	if err != nil {
@@ -163,25 +160,7 @@ func (w *ServerInterfaceWrapper) UpdateTask(ctx echo.Context) error {
 	ctx.Set(AccessTokenScopes, []string{""})
 
 	// Invoke the callback with all the unmarshalled arguments
-	err = w.Handler.UpdateTask(ctx, taskID)
-	return err
-}
-
-// UpdateTaskStatus converts echo context to params.
-func (w *ServerInterfaceWrapper) UpdateTaskStatus(ctx echo.Context) error {
-	var err error
-	// ------------- Path parameter "taskID" -------------
-	var taskID PathTaskID
-
-	err = runtime.BindStyledParameterWithLocation("simple", false, "taskID", runtime.ParamLocationPath, ctx.Param("taskID"), &taskID)
-	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter taskID: %s", err))
-	}
-
-	ctx.Set(AccessTokenScopes, []string{""})
-
-	// Invoke the callback with all the unmarshalled arguments
-	err = w.Handler.UpdateTaskStatus(ctx, taskID)
+	err = w.Handler.PatchTask(ctx, taskID)
 	return err
 }
 
@@ -223,14 +202,13 @@ func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL 
 	}
 
 	router.GET(baseURL+"/__/users", wrapper.ListUsersForAdmin)
-	router.POST(baseURL+"/authtoken/new", wrapper.NewAuthToken)
+	router.POST(baseURL+"/authtoken/new", wrapper.CreateAuthToken)
 	router.GET(baseURL+"/ping", wrapper.GetPing)
 	router.GET(baseURL+"/tasks", wrapper.ListTasks)
 	router.POST(baseURL+"/tasks", wrapper.CreateTask)
 	router.DELETE(baseURL+"/tasks/:taskID", wrapper.DeleteTask)
 	router.GET(baseURL+"/tasks/:taskID", wrapper.GetTask)
-	router.PUT(baseURL+"/tasks/:taskID", wrapper.UpdateTask)
-	router.PUT(baseURL+"/tasks/:taskID/status", wrapper.UpdateTaskStatus)
+	router.PATCH(baseURL+"/tasks/:taskID", wrapper.PatchTask)
 	router.POST(baseURL+"/users", wrapper.CreateUser)
 
 }
