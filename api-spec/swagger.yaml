@@ -283,7 +283,7 @@ components:
         リソースの存在自体を把握されないようにするために、
         Forbidden ではなく NotFound のステータスコードを返す。
       content:
-        test/plain:
+        text/plain:
           schema: { type: string }
     Resp409DuplicatedValue:
       description: Duplicated value.
