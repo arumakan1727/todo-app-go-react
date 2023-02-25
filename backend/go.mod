@@ -4,12 +4,12 @@ go 1.20
 
 require (
 	github.com/deepmap/oapi-codegen v1.12.4
-	github.com/getkin/kin-openapi v0.107.0
 	github.com/labstack/echo/v4 v4.9.1
 )
 
 require (
 	github.com/apapsch/go-jsonmerge/v2 v2.0.0 // indirect
+	github.com/getkin/kin-openapi v0.107.0 // indirect
 	github.com/go-openapi/jsonpointer v0.19.5 // indirect
 	github.com/go-openapi/swag v0.21.1 // indirect
 	github.com/google/uuid v1.3.0 // indirect
