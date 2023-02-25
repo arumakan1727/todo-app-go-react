@@ -3,7 +3,7 @@ package handler
 import (
 	"context"
 
-	"github.com/arumakan1727/todo-app-go-react/app/server/schema"
+	"github.com/arumakan1727/todo-app-go-react/schema"
 	"github.com/labstack/echo/v4"
 )
 

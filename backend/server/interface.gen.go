@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"net/http"
 
-	. "github.com/arumakan1727/todo-app-go-react/app/server/schema"
+	. "github.com/arumakan1727/todo-app-go-react/schema"
 	"github.com/deepmap/oapi-codegen/pkg/runtime"
 	"github.com/labstack/echo/v4"
 )
