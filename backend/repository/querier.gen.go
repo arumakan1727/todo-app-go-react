@@ -9,7 +9,12 @@ import (
 )
 
 type Querier interface {
+	DeleteTask(ctx context.Context, id int32) error
+	GetTask(ctx context.Context, id int32) (Task, error)
 	GetUserByEmail(ctx context.Context, email string) (User, error)
+	InsertTask(ctx context.Context, arg InsertTaskParams) error
+	InsertUser(ctx context.Context, arg InsertUserParams) error
+	ListUsers(ctx context.Context) ([]ListUsersRow, error)
 }
 
 var _ Querier = (*Queries)(nil)

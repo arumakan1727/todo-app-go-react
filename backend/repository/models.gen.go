@@ -9,18 +9,18 @@ import (
 )
 
 type Task struct {
-	ID        int32
-	UserID    int32
-	Title     string
-	Done      bool
-	CreatedAt time.Time
+	ID        int32     `db:"id"`
+	UserID    int32     `db:"user_id"`
+	Title     string    `db:"title"`
+	Done      bool      `db:"done"`
+	CreatedAt time.Time `db:"created_at"`
 }
 
 type User struct {
-	ID          int32
-	Role        string
-	Email       string
-	PasswdHash  []byte
-	DisplayName string
-	CreatedAt   time.Time
+	ID          int32     `db:"id"`
+	Role        string    `db:"role"`
+	Email       string    `db:"email"`
+	PasswdHash  []byte    `db:"passwd_hash"`
+	DisplayName string    `db:"display_name"`
+	CreatedAt   time.Time `db:"created_at"`
 }
