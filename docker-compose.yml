@@ -1,0 +1,29 @@
+version: "3.9"
+services:
+  postgres:
+    image: postgres:15.2
+    container_name: "${X_CONTAINER_NAME_POSTGRES:-todoapp_postgres}"
+    environment:
+      POSTGRES_USER: todoapp
+      POSTGRES_PASSWORD: todoapp
+      POSTGRES_DB: todoapp
+      POSTGRES_INITDB_ARGS: "--encoding=UTF-8"
+      PGDATA: /var/lib/postgresql/data/pgdata
+      TZ: "${X_TZ_POSTGRES:-Asia/Tokyo}"
+    volumes:
+      - todoapp-db-data:/var/lib/postgresql/data
+      - ./db/initdb.d/:/docker-entrypoint-initdb.d:cached
+    ports:
+      - "${X_BIND_PORT_POSTGRES:-25432}:5432"
+
+  redis:
+    image: redis:latest
+    container_name: "${X_CONTAINER_NAME_REDIS:-todoapp_redis}"
+    ports:
+      - "${X_BIND_PORT_REDIS:-26379}:6379"
+    volumes:
+      - todoapp-redis-data:/data
+
+volumes:
+  todoapp-db-data:
+  todoapp-redis-data:
