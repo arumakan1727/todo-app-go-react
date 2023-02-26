@@ -34,7 +34,7 @@ docker/ps:	## Check container status
 
 .PHONY:	__docker/down-remove
 __docker/down-remove:	## Remove containers and volumes
-	docker compose down --rmi all --volumes --remove-orphans
+	docker compose down --rmi local --volumes --remove-orphans
 
 .PHONY:	db/client
 db/client:	## Launch db client
