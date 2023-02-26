@@ -1,3 +1,4 @@
+.DEFAULT_GOAL   := help
 GO_TEST_FLAG    := -race -shuffle=on
 DB_SERVICE      := postgres
 REDIS_SERVICE   := redis
@@ -45,12 +46,11 @@ db/bash:	 ## Launch bash in db service
 
 .PHONY:	db/migration/status
 db/migration/status:	## Show migration status
-	psqldef -Utodoapp -p25432 -h 127.0.0.1 --dry-run --config=.psqldef.yml todoapp < ./db/schema.sql | bat -lsql
 	dbmate status
 
-.PHONY:	db/migration/create
-db/migration/create:	## Create migration file from 'db/schema.sql'
-	./scripts/make-migration.sh
+.PHONY:	db/migration/gen
+db/migration/gen:	## Generate migration file from 'db/schema.sql'
+	@./scripts/make-migration.sh
 
 .PHONY:	db/migration/up
 db/migration/up:	## Apply migration
