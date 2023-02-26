@@ -8,6 +8,7 @@ services:
       POSTGRES_PASSWORD: todoapp
       POSTGRES_DB: todoapp
       POSTGRES_INITDB_ARGS: "--encoding=UTF-8"
+      POSTGRES_HOST_AUTH_METHOD: trust
       PGDATA: /var/lib/postgresql/data/pgdata
       TZ: "${X_TZ_POSTGRES:-Asia/Tokyo}"
     volumes:

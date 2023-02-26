@@ -1,10 +1,10 @@
 GO_TEST_FLAG    := -race -shuffle=on
-RED       := \033[31m
-CYAN      := \033[36m
-MAGENTA   := \033[35m
-RESET     := \033[0m
 DB_SERVICE      := postgres
 REDIS_SERVICE   := redis
+RED      := \033[31m
+CYAN     := \033[36m
+MAGENTA  := \033[35m
+RESET    := \033[0m
 
 
 .PHONY:	docker/build/dev
@@ -42,6 +42,23 @@ db/client:	## Launch db client
 .PHONY:	db/bash
 db/bash:	 ## Launch bash in db service
 	docker compose exec $(DB_SERVICE) bash
+
+.PHONY:	db/migration/status
+db/migration/status:	## Show migration status
+	psqldef -Utodoapp -p25432 -h 127.0.0.1 --dry-run --config=.psqldef.yml todoapp < ./db/schema.sql | bat -lsql
+	dbmate status
+
+.PHONY:	db/migration/create
+db/migration/create:	## Create migration file from 'db/schema.sql'
+	./scripts/make-migration.sh
+
+.PHONY:	db/migration/up
+db/migration/up:	## Apply migration
+	dbmate up
+
+.PHONY:	db/migration/dump
+db/migration/dump:	## Dump table schema
+	dbmate dump
 
 .PHONY:	help
 help:	## Show tasks
