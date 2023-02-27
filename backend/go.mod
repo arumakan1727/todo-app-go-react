@@ -4,6 +4,7 @@ go 1.20
 
 require (
 	github.com/deepmap/oapi-codegen v1.12.4
+	github.com/jmoiron/sqlx v1.3.5
 	github.com/kyleconroy/sqlc v1.17.2
 	github.com/labstack/echo/v4 v4.9.1
 )
