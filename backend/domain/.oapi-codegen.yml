@@ -1,5 +1,5 @@
 # available config options: https://github.com/deepmap/oapi-codegen/blob/master/pkg/codegen/configuration.go
-package: schema
+package: domain
 output: schema.gen.go
 generate:
   models: true

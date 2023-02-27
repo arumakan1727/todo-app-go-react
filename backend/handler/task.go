@@ -1,0 +1,68 @@
+package handler
+
+import (
+	"github.com/arumakan1727/todo-app-go-react/domain"
+	"github.com/labstack/echo/v4"
+)
+
+type TaskHandler Handler[domain.TaskUsecase]
+
+func (h *TaskHandler) ListTasks(c echo.Context, params domain.ListTasksParams) error {
+	ctx := c.Request().Context()
+
+	list, err := h.usecase.List(ctx, params)
+	if err != nil {
+		return err
+	}
+	return c.JSON(200, list)
+}
+
+func (h *TaskHandler) CreateTask(c echo.Context) error {
+	ctx := c.Request().Context()
+
+	var b domain.ReqCreateTask
+	if err := parseBodyAsJSON(ctx, c.Request(), &b); err != nil {
+		return err
+	}
+
+	task, err := h.usecase.Store(ctx, &b)
+	if err != nil {
+		return err
+	}
+	return c.JSON(200, task)
+}
+
+func (h *TaskHandler) DeleteTask(c echo.Context, taskID int) error {
+	ctx := c.Request().Context()
+
+	err := h.usecase.Delete(ctx, 0, domain.TaskID(taskID))
+	if err != nil {
+		return err
+	}
+	return c.String(200, "deleted")
+}
+
+func (h *TaskHandler) GetTask(c echo.Context, taskID int) error {
+	ctx := c.Request().Context()
+
+	task, err := h.usecase.Get(ctx, 0, domain.TaskID(taskID))
+	if err != nil {
+		return err
+	}
+	return c.JSON(200, task)
+}
+
+func (h *TaskHandler) PatchTask(c echo.Context, taskID int) error {
+	ctx := c.Request().Context()
+
+	var b domain.ReqPatchTask
+	if err := parseBodyAsJSON(ctx, c.Request(), &b); err != nil {
+		return err
+	}
+
+	task, err := h.usecase.Patch(ctx, 0, domain.TaskID(taskID), &b)
+	if err != nil {
+		return err
+	}
+	return c.JSON(200, task)
+}

@@ -6,7 +6,7 @@ generate:
 compatibility:
   always-prefix-enum-values: true
 additional-imports:
-  - package: "github.com/arumakan1727/todo-app-go-react/schema"
+  - package: "github.com/arumakan1727/todo-app-go-react/domain"
     alias: "."
 output-options:
   skip-prune: true

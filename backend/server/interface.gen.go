@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"net/http"
 
-	. "github.com/arumakan1727/todo-app-go-react/schema"
+	. "github.com/arumakan1727/todo-app-go-react/domain"
 	"github.com/deepmap/oapi-codegen/pkg/runtime"
 	"github.com/labstack/echo/v4"
 )
@@ -31,13 +31,13 @@ type ServerInterface interface {
 	CreateTask(ctx echo.Context) error
 
 	// (DELETE /tasks/{taskID})
-	DeleteTask(ctx echo.Context, taskID TaskID) error
+	DeleteTask(ctx echo.Context, taskID int) error
 
 	// (GET /tasks/{taskID})
-	GetTask(ctx echo.Context, taskID TaskID) error
+	GetTask(ctx echo.Context, taskID int) error
 
 	// (PATCH /tasks/{taskID})
-	PatchTask(ctx echo.Context, taskID TaskID) error
+	PatchTask(ctx echo.Context, taskID int) error
 
 	// (POST /users)
 	CreateUser(ctx echo.Context) error
@@ -114,7 +114,7 @@ func (w *ServerInterfaceWrapper) CreateTask(ctx echo.Context) error {
 func (w *ServerInterfaceWrapper) DeleteTask(ctx echo.Context) error {
 	var err error
 	// ------------- Path parameter "taskID" -------------
-	var taskID TaskID
+	var taskID int
 
 	err = runtime.BindStyledParameterWithLocation("simple", false, "taskID", runtime.ParamLocationPath, ctx.Param("taskID"), &taskID)
 	if err != nil {
@@ -132,7 +132,7 @@ func (w *ServerInterfaceWrapper) DeleteTask(ctx echo.Context) error {
 func (w *ServerInterfaceWrapper) GetTask(ctx echo.Context) error {
 	var err error
 	// ------------- Path parameter "taskID" -------------
-	var taskID TaskID
+	var taskID int
 
 	err = runtime.BindStyledParameterWithLocation("simple", false, "taskID", runtime.ParamLocationPath, ctx.Param("taskID"), &taskID)
 	if err != nil {
@@ -150,7 +150,7 @@ func (w *ServerInterfaceWrapper) GetTask(ctx echo.Context) error {
 func (w *ServerInterfaceWrapper) PatchTask(ctx echo.Context) error {
 	var err error
 	// ------------- Path parameter "taskID" -------------
-	var taskID TaskID
+	var taskID int
 
 	err = runtime.BindStyledParameterWithLocation("simple", false, "taskID", runtime.ParamLocationPath, ctx.Param("taskID"), &taskID)
 	if err != nil {

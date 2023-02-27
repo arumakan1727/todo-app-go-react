@@ -1,6 +1,6 @@
 package server
 
-import "github.com/arumakan1727/todo-app-go-react/server/handler"
+import "github.com/arumakan1727/todo-app-go-react/handler"
 
 type Handler struct {
 	handler.PingHandler

@@ -5,23 +5,23 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/arumakan1727/todo-app-go-react/schema"
+	"github.com/arumakan1727/todo-app-go-react/domain"
 	"github.com/jmoiron/sqlx"
 )
 
 func (q *Queries) ListTasksFilterByStatus(
 	ctx context.Context,
 	userID int32,
-	done schema.ListTasksParamsDone,
+	done domain.ListTasksParamsDone,
 ) ([]*Task, error) {
 	query := `select id, title, done, created_at where user_id=$1 `
 
 	switch done {
-	case schema.ListTasksParamsDoneAny:
+	case domain.ListTasksParamsDoneAny:
 		break // do nothing
-	case schema.ListTasksParamsDoneTrue:
+	case domain.ListTasksParamsDoneTrue:
 		query += " AND done=true"
-	case schema.ListTasksParamsDoneFalse:
+	case domain.ListTasksParamsDoneFalse:
 		query += " AND done=false"
 	}
 
@@ -40,7 +40,7 @@ func (q *Queries) PatchTask(
 	ctx context.Context,
 	taskID int32,
 	userID int32,
-	p *schema.ReqPatchTask,
+	p *domain.ReqPatchTask,
 ) (*Task, error) {
 	query := `UPDATE tasks SET `
 	qParts := []string{}

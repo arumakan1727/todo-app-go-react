@@ -88,7 +88,10 @@ paths:
           $ref: "#/components/responses/Resp401MissingOrInvalidToken"
   "/tasks/{taskID}":
     parameters:
-      - $ref: "#/components/parameters/TaskID"
+      - name: taskID
+        in: path
+        required: true
+        schema: { type: integer }
     get:
       operationId: GetTask
       description: Get a task.
@@ -181,10 +184,30 @@ components:
         accessToken: { type: string }
 
     # ----- task -----
+    TaskID:
+      type: integer
+      x-go-type: uint64
+
     TaskTitle:
       type: string
       minLength: 1
       maxLength: 40
+
+    Task:
+      type: object
+      required: [id, title, done, createdAt]
+      properties:
+        id: { $ref: "#/components/schemas/TaskID" }
+        title: { type: string }
+        done: { type: boolean }
+        createdAt: { type: string, format: date-time }
+
+    TaskList:
+      type: object
+      required: [totalCount, items]
+      properties:
+        totalCount: { type: integer }
+        items: { type: array, items: { $ref: "#/components/schemas/Task" } }
 
     ReqCreateTask:
       type: object
@@ -198,36 +221,16 @@ components:
         title: { $ref: "#/components/schemas/TaskTitle" }
         done: { type: boolean }
 
-    Task:
-      type: object
-      required: [id, title, done, createdAt]
-      properties:
-        id: { type: integer }
-        title: { type: string }
-        done: { type: boolean }
-        createdAt: { type: string, format: date-time }
-
-    TaskList:
-      type: object
-      required: [totalCount, items]
-      properties:
-        totalCount: { type: integer }
-        items: { type: array, items: { $ref: "#/components/schemas/Task" } }
-
     # ----- user -----
-    ReqCreateUser:
-      type: object
-      required: [email, password, displayName]
-      properties:
-        email: { type: string, format: email, maxLength: 320 }
-        password: { $ref: "#/components/schemas/Password" }
-        displayName: { type: string, minLength: 1, maxLength: 20 }
+    UserID:
+      type: integer
+      x-go-type: uint64
 
     User:
       type: object
       required: [id, email, displayName, createdAt]
       properties:
-        id: { type: integer }
+        id: { $ref: "#/components/schemas/UserID" }
         email: { type: string, format: email }
         displayName: { type: string }
         createdAt: { type: string, format: date-time }
@@ -239,14 +242,15 @@ components:
         totalCount: { type: integer }
         items: { type: array, items: { $ref: "#/components/schemas/User" } }
 
+    ReqCreateUser:
+      type: object
+      required: [email, password, displayName]
+      properties:
+        email: { type: string, format: email, maxLength: 320 }
+        password: { $ref: "#/components/schemas/Password" }
+        displayName: { type: string, minLength: 1, maxLength: 20 }
+
   #----------------------------------
-  parameters:
-    TaskID:
-      name: taskID
-      in: path
-      required: true
-      schema:
-        type: integer
   responses:
     Resp200Task:
       description: OK (returning a task)
