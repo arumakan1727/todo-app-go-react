@@ -60,6 +60,10 @@ db/migration/up:	## Apply migration
 db/migration/dump:	## Dump table schema
 	dbmate dump
 
+.PHONY:	lint/spectral
+lint/spectral:	## Lint swagger.yaml
+	spectral lint --ruleset .spectral.yaml -f pretty api-spec/swagger.yaml
+
 .PHONY:	help
 help:	## Show tasks
 	@grep -E '^[a-zA-Z_/-]+:' Makefile | \
