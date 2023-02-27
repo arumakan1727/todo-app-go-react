@@ -26,7 +26,7 @@ type AuthToken struct {
 }
 
 // Password defines model for Password.
-type Password = string
+type Password string
 
 // ReqCreateAuthToken defines model for ReqCreateAuthToken.
 type ReqCreateAuthToken struct {
@@ -61,7 +61,7 @@ type Task struct {
 }
 
 // TaskID defines model for TaskID.
-type TaskID = uint64
+type TaskID uint64
 
 // TaskList defines model for TaskList.
 type TaskList struct {
@@ -70,7 +70,7 @@ type TaskList struct {
 }
 
 // TaskTitle defines model for TaskTitle.
-type TaskTitle = string
+type TaskTitle string
 
 // User defines model for User.
 type User struct {
@@ -81,16 +81,13 @@ type User struct {
 }
 
 // UserID defines model for UserID.
-type UserID = uint64
+type UserID uint64
 
 // UserList defines model for UserList.
 type UserList struct {
 	Items      []User `json:"items"`
 	TotalCount int    `json:"totalCount"`
 }
-
-// Resp200Task defines model for Resp200Task.
-type Resp200Task = Task
 
 // ListTasksParams defines parameters for ListTasks.
 type ListTasksParams struct {
@@ -101,14 +98,4 @@ type ListTasksParams struct {
 // ListTasksParamsDone defines parameters for ListTasks.
 type ListTasksParamsDone string
 
-// CreateAuthTokenJSONRequestBody defines body for CreateAuthToken for application/json ContentType.
-type CreateAuthTokenJSONRequestBody = ReqCreateAuthToken
-
-// CreateTaskJSONRequestBody defines body for CreateTask for application/json ContentType.
-type CreateTaskJSONRequestBody = ReqCreateTask
-
-// PatchTaskJSONRequestBody defines body for PatchTask for application/json ContentType.
-type PatchTaskJSONRequestBody = ReqPatchTask
-
-// CreateUserJSONRequestBody defines body for CreateUser for application/json ContentType.
-type CreateUserJSONRequestBody = ReqCreateUser
+// request-bodies.tmpl (empty)

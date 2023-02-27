@@ -10,3 +10,5 @@ additional-imports:
     alias: "."
 output-options:
   skip-prune: true
+  user-templates:
+    echo/echo-register.tmpl: "// echo-register.tmpl (empty)"

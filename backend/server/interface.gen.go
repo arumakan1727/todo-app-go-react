@@ -173,42 +173,4 @@ func (w *ServerInterfaceWrapper) CreateUser(ctx echo.Context) error {
 	return err
 }
 
-// This is a simple interface which specifies echo.Route addition functions which
-// are present on both echo.Echo and echo.Group, since we want to allow using
-// either of them for path registration
-type EchoRouter interface {
-	CONNECT(path string, h echo.HandlerFunc, m ...echo.MiddlewareFunc) *echo.Route
-	DELETE(path string, h echo.HandlerFunc, m ...echo.MiddlewareFunc) *echo.Route
-	GET(path string, h echo.HandlerFunc, m ...echo.MiddlewareFunc) *echo.Route
-	HEAD(path string, h echo.HandlerFunc, m ...echo.MiddlewareFunc) *echo.Route
-	OPTIONS(path string, h echo.HandlerFunc, m ...echo.MiddlewareFunc) *echo.Route
-	PATCH(path string, h echo.HandlerFunc, m ...echo.MiddlewareFunc) *echo.Route
-	POST(path string, h echo.HandlerFunc, m ...echo.MiddlewareFunc) *echo.Route
-	PUT(path string, h echo.HandlerFunc, m ...echo.MiddlewareFunc) *echo.Route
-	TRACE(path string, h echo.HandlerFunc, m ...echo.MiddlewareFunc) *echo.Route
-}
-
-// RegisterHandlers adds each server route to the EchoRouter.
-func RegisterHandlers(router EchoRouter, si ServerInterface) {
-	RegisterHandlersWithBaseURL(router, si, "")
-}
-
-// Registers handlers, and prepends BaseURL to the paths, so that the paths
-// can be served under a prefix.
-func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL string) {
-
-	wrapper := ServerInterfaceWrapper{
-		Handler: si,
-	}
-
-	router.GET(baseURL+"/__/users", wrapper.ListUsersForAdmin)
-	router.POST(baseURL+"/authtoken/new", wrapper.CreateAuthToken)
-	router.GET(baseURL+"/ping", wrapper.GetPing)
-	router.GET(baseURL+"/tasks", wrapper.ListTasks)
-	router.POST(baseURL+"/tasks", wrapper.CreateTask)
-	router.DELETE(baseURL+"/tasks/:taskID", wrapper.DeleteTask)
-	router.GET(baseURL+"/tasks/:taskID", wrapper.GetTask)
-	router.PATCH(baseURL+"/tasks/:taskID", wrapper.PatchTask)
-	router.POST(baseURL+"/users", wrapper.CreateUser)
-
-}
+// echo-register.tmpl (empty)
