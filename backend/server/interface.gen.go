@@ -31,13 +31,13 @@ type ServerInterface interface {
 	CreateTask(ctx echo.Context) error
 
 	// (DELETE /tasks/{taskID})
-	DeleteTask(ctx echo.Context, taskID int) error
+	DeleteTask(ctx echo.Context, taskID TaskID) error
 
 	// (GET /tasks/{taskID})
-	GetTask(ctx echo.Context, taskID int) error
+	GetTask(ctx echo.Context, taskID TaskID) error
 
 	// (PATCH /tasks/{taskID})
-	PatchTask(ctx echo.Context, taskID int) error
+	PatchTask(ctx echo.Context, taskID TaskID) error
 
 	// (POST /users)
 	CreateUser(ctx echo.Context) error
@@ -87,11 +87,11 @@ func (w *ServerInterfaceWrapper) ListTasks(ctx echo.Context) error {
 
 	// Parameter object where we will unmarshal all parameters from the context
 	var params ListTasksParams
-	// ------------- Optional query parameter "done" -------------
+	// ------------- Optional query parameter "status" -------------
 
-	err = runtime.BindQueryParameter("form", true, false, "done", ctx.QueryParams(), &params.Done)
+	err = runtime.BindQueryParameter("form", true, false, "status", ctx.QueryParams(), &params.Status)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter done: %s", err))
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter status: %s", err))
 	}
 
 	// Invoke the callback with all the unmarshalled arguments
@@ -114,7 +114,7 @@ func (w *ServerInterfaceWrapper) CreateTask(ctx echo.Context) error {
 func (w *ServerInterfaceWrapper) DeleteTask(ctx echo.Context) error {
 	var err error
 	// ------------- Path parameter "taskID" -------------
-	var taskID int
+	var taskID TaskID
 
 	err = runtime.BindStyledParameterWithLocation("simple", false, "taskID", runtime.ParamLocationPath, ctx.Param("taskID"), &taskID)
 	if err != nil {
@@ -132,7 +132,7 @@ func (w *ServerInterfaceWrapper) DeleteTask(ctx echo.Context) error {
 func (w *ServerInterfaceWrapper) GetTask(ctx echo.Context) error {
 	var err error
 	// ------------- Path parameter "taskID" -------------
-	var taskID int
+	var taskID TaskID
 
 	err = runtime.BindStyledParameterWithLocation("simple", false, "taskID", runtime.ParamLocationPath, ctx.Param("taskID"), &taskID)
 	if err != nil {
@@ -150,7 +150,7 @@ func (w *ServerInterfaceWrapper) GetTask(ctx echo.Context) error {
 func (w *ServerInterfaceWrapper) PatchTask(ctx echo.Context) error {
 	var err error
 	// ------------- Path parameter "taskID" -------------
-	var taskID int
+	var taskID TaskID
 
 	err = runtime.BindStyledParameterWithLocation("simple", false, "taskID", runtime.ParamLocationPath, ctx.Param("taskID"), &taskID)
 	if err != nil {

@@ -13,11 +13,11 @@ const (
 	AccessTokenScopes = "accessToken.Scopes"
 )
 
-// Defines values for ListTasksParamsDone.
+// Defines values for TaskStatusFilter.
 const (
-	ListTasksParamsDoneAny   ListTasksParamsDone = "any"
-	ListTasksParamsDoneFalse ListTasksParamsDone = "false"
-	ListTasksParamsDoneTrue  ListTasksParamsDone = "true"
+	TaskStatusFilterAny  TaskStatusFilter = "any"
+	TaskStatusFilterDone TaskStatusFilter = "done"
+	TaskStatusFilterTodo TaskStatusFilter = "todo"
 )
 
 // AuthToken defines model for AuthToken.
@@ -69,6 +69,9 @@ type TaskList struct {
 	TotalCount int    `json:"totalCount"`
 }
 
+// TaskStatusFilter タスクの完了状態のフィルタリング指定
+type TaskStatusFilter string
+
 // TaskTitle defines model for TaskTitle.
 type TaskTitle string
 
@@ -91,11 +94,8 @@ type UserList struct {
 
 // ListTasksParams defines parameters for ListTasks.
 type ListTasksParams struct {
-	// Done タスクの完了状態のフィルタリング指定
-	Done *ListTasksParamsDone `form:"done,omitempty" json:"done,omitempty"`
+	// Status タスクの完了状態のフィルタリング指定
+	Status *TaskStatusFilter `form:"status,omitempty" json:"status,omitempty"`
 }
-
-// ListTasksParamsDone defines parameters for ListTasks.
-type ListTasksParamsDone string
 
 // request-bodies.tmpl (empty)

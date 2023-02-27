@@ -32,27 +32,27 @@ func (h *TaskHandler) CreateTask(c echo.Context) error {
 	return c.JSON(200, task)
 }
 
-func (h *TaskHandler) DeleteTask(c echo.Context, taskID int) error {
+func (h *TaskHandler) DeleteTask(c echo.Context, taskID domain.TaskID) error {
 	ctx := c.Request().Context()
 
-	err := h.usecase.Delete(ctx, 0, domain.TaskID(taskID))
+	err := h.usecase.Delete(ctx, 0, taskID)
 	if err != nil {
 		return err
 	}
 	return c.String(200, "deleted")
 }
 
-func (h *TaskHandler) GetTask(c echo.Context, taskID int) error {
+func (h *TaskHandler) GetTask(c echo.Context, taskID domain.TaskID) error {
 	ctx := c.Request().Context()
 
-	task, err := h.usecase.Get(ctx, 0, domain.TaskID(taskID))
+	task, err := h.usecase.Get(ctx, 0, taskID)
 	if err != nil {
 		return err
 	}
 	return c.JSON(200, task)
 }
 
-func (h *TaskHandler) PatchTask(c echo.Context, taskID int) error {
+func (h *TaskHandler) PatchTask(c echo.Context, taskID domain.TaskID) error {
 	ctx := c.Request().Context()
 
 	var b domain.ReqPatchTask
@@ -60,7 +60,7 @@ func (h *TaskHandler) PatchTask(c echo.Context, taskID int) error {
 		return err
 	}
 
-	task, err := h.usecase.Patch(ctx, 0, domain.TaskID(taskID), &b)
+	task, err := h.usecase.Patch(ctx, 0, taskID, &b)
 	if err != nil {
 		return err
 	}

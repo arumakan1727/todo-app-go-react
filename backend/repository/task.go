@@ -12,16 +12,16 @@ import (
 func (q *Queries) ListTasksFilterByStatus(
 	ctx context.Context,
 	userID int32,
-	done domain.ListTasksParamsDone,
+	done domain.TaskStatusFilter,
 ) ([]*Task, error) {
 	query := `select id, title, done, created_at where user_id=$1 `
 
 	switch done {
-	case domain.ListTasksParamsDoneAny:
+	case domain.TaskStatusFilterAny:
 		break // do nothing
-	case domain.ListTasksParamsDoneTrue:
+	case domain.TaskStatusFilterDone:
 		query += " AND done=true"
-	case domain.ListTasksParamsDoneFalse:
+	case domain.TaskStatusFilterTodo:
 		query += " AND done=false"
 	}
 

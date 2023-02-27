@@ -57,14 +57,13 @@ paths:
       description: Get tasks owned by request user.
       tags: [task]
       parameters:
-        - name: done
+        - name: status
           in: query
           description: タスクの完了状態のフィルタリング指定
           required: false
           schema:
-            type: string
-            enum: ["false", "true", any]
-            default: "false"
+            $ref: "#/components/schemas/TaskStatusFilter"
+            default: todo
       responses:
         "200":
           description: OK
@@ -91,7 +90,7 @@ paths:
       - name: taskID
         in: path
         required: true
-        schema: { type: integer }
+        schema: { $ref: "#/components/schemas/TaskID" }
     get:
       operationId: GetTask
       description: Get a task.
@@ -208,6 +207,11 @@ components:
       properties:
         totalCount: { type: integer }
         items: { type: array, items: { $ref: "#/components/schemas/Task" } }
+
+    TaskStatusFilter:
+      description: タスクの完了状態のフィルタリング指定
+      type: string
+      enum: [todo, done, any]
 
     ReqCreateTask:
       type: object

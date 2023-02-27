@@ -13,11 +13,9 @@ output-options:
 
     param-types.tmpl: |
       {{range .}}{{$opid := .OperationId}}
-      {{range .TypeDefinitions}}{{$typeNameHead := slice .TypeName 0 4}}
-      {{if ne $typeNameHead "Path"}}
+      {{range .TypeDefinitions}}
       // {{.TypeName}} defines parameters for {{$opid}}.
       type {{.TypeName}} {{if .IsAlias}}={{end}} {{.Schema.TypeDecl}}
-      {{end}}
       {{end}}
       {{end}}
 
