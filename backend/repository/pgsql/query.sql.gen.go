@@ -3,7 +3,7 @@
 //   sqlc v1.17.2
 // source: query.sql
 
-package repository
+package pgsql
 
 import (
 	"context"
@@ -14,7 +14,7 @@ const deleteTask = `-- name: DeleteTask :exec
 delete from tasks where id = $1
 `
 
-func (q *Queries) DeleteTask(ctx context.Context, id int32) error {
+func (q *Queries) DeleteTask(ctx context.Context, id uint64) error {
 	_, err := q.db.ExecContext(ctx, deleteTask, id)
 	return err
 }
@@ -23,7 +23,7 @@ const getTask = `-- name: GetTask :one
 select id, user_id, title, done, created_at from tasks where id = $1 limit 1
 `
 
-func (q *Queries) GetTask(ctx context.Context, id int32) (Task, error) {
+func (q *Queries) GetTask(ctx context.Context, id uint64) (Task, error) {
 	row := q.db.QueryRowContext(ctx, getTask, id)
 	var i Task
 	err := row.Scan(
@@ -101,7 +101,7 @@ from users
 `
 
 type ListUsersRow struct {
-	ID          int32     `db:"id"`
+	ID          uint64    `db:"id"`
 	Email       string    `db:"email"`
 	DisplayName string    `db:"display_name"`
 	CreatedAt   time.Time `db:"created_at"`
