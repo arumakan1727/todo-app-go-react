@@ -11,4 +11,5 @@ additional-imports:
 output-options:
   skip-prune: true
   user-templates:
+    # see: https://github.com/deepmap/oapi-codegen/tree/master/pkg/codegen/templates
     echo/echo-register.tmpl: "// echo-register.tmpl (empty)"
