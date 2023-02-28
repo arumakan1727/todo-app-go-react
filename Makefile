@@ -1,5 +1,4 @@
 .DEFAULT_GOAL   := help
-GO_TEST_FLAG    := -race -shuffle=on
 DB_SERVICE      := postgres
 REDIS_SERVICE   := redis
 RED      := \033[31m
@@ -65,7 +64,7 @@ lint/spectral:	## Lint swagger.yaml
 	spectral lint --ruleset .spectral.yaml -f pretty api-spec/swagger.yaml
 
 .PHONY:	help
-help:	## Show tasks
+help:	## Show Makefile tasks
 	@grep -E '^[a-zA-Z_/-]+:' Makefile | \
 		awk 'BEGIN {FS = ":(.*##\\s*)?"}; {printf "$(CYAN)%-24s$(RESET) %s\n", $$1, $$2}'
 
