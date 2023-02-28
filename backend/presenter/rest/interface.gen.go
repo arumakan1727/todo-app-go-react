@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"net/http"
 
-	. "github.com/arumakan1727/todo-app-go-react/domain"
 	"github.com/deepmap/oapi-codegen/pkg/runtime"
 	"github.com/labstack/echo/v4"
 )

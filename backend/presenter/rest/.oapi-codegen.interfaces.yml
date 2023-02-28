@@ -5,9 +5,6 @@ generate:
   echo-server: true
 compatibility:
   always-prefix-enum-values: true
-additional-imports:
-  - package: "github.com/arumakan1727/todo-app-go-react/domain"
-    alias: "."
 output-options:
   skip-prune: true
   user-templates:

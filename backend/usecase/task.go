@@ -1,30 +1,32 @@
 package usecase
 
 import (
-	"context"
-
 	. "github.com/arumakan1727/todo-app-go-react/domain"
 )
 
-type taskUcase struct {
+type taskUc struct {
 }
 
 func NewTaskUsecase() TaskUcase {
-	return &taskUcase{}
+	return &taskUc{}
 }
 
-func (uc *taskUcase) List(ctx context.Context, p ListTasksParams) (TaskList, error) {
-	return TaskList{}, nil
+func (uc *taskUc) Store(ctx Ctx, uid UserID, title string) (Task, error) {
+	panic("TODO")
 }
-func (uc *taskUcase) Store(ctx context.Context, p *ReqCreateTask) (Task, error) {
-	panic("not implemented")
+
+func (uc *taskUc) List(ctx Ctx, uid UserID, filterDoneEq *bool) ([]Task, error) {
+	panic("TODO")
 }
-func (uc *taskUcase) Get(ctx context.Context, uid UserID, tid TaskID) (Task, error) {
-	panic("not implemented")
+
+func (uc *taskUc) Get(Ctx, UserID, TaskID) (Task, error) {
+	panic("TODO")
 }
-func (uc *taskUcase) Patch(ctx context.Context, uid UserID, tid TaskID, p *ReqPatchTask) (Task, error) {
-	panic("not implemented")
+
+func (uc *taskUc) Patch(Ctx, UserID, TaskID, TaskPatch) (Task, error) {
+	panic("TODO")
 }
-func (uc *taskUcase) Delete(ctx context.Context, uid UserID, tid TaskID) error {
-	panic("not implemented")
+
+func (uc *taskUc) Delete(Ctx, UserID, TaskID) error {
+	panic("TODO")
 }

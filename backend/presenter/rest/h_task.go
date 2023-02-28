@@ -7,45 +7,65 @@ import (
 
 type TaskHandler gHandler[domain.TaskUcase]
 
-func (h TaskHandler) ListTasks(c echo.Context, params domain.ListTasksParams) error {
-	ctx := c.Request().Context()
+func fillRespTask(r *RespTask, t *domain.Task) {
+	r.CreatedAt = t.CreatedAt
+	r.Done = t.Done
+	r.Id = t.ID
+	r.Title = t.Title
+}
 
-	list, err := h.usecase.List(ctx, params)
+func (h TaskHandler) ListTasks(c echo.Context, params ListTasksParams) error {
+	ctx := c.Request().Context()
+	uid, err := ctxGetUserID(ctx)
 	if err != nil {
 		return err
 	}
 
-	res := make([]domain.RespTask, 0, len(list))
-	for _, t := range list {
-		res = append(res, domain.RespTask{
-			CreatedAt: time.Time{},
-			Done:      false,
-			Id:        0,
-			Title:     "",
-		})
+	var filterDoneEq *bool
+	if params.Status == nil || *params.Status == TaskStatusFilterAny {
+		filterDoneEq = nil
+	} else {
+		filterDoneEq = new(bool)
+		*filterDoneEq = (*params.Status == TaskStatusFilterDone)
 	}
-	return c.JSON(200, list)
+	xs, err := h.usecase.List(ctx, uid, filterDoneEq)
+	if err != nil {
+		return err
+	}
+
+	return c.JSON(200, RespTaskList{
+		Items:      toRespArray(xs, fillRespTask),
+		TotalCount: len(xs),
+	})
 }
 
 func (h TaskHandler) CreateTask(c echo.Context) error {
 	ctx := c.Request().Context()
+	uid, err := ctxGetUserID(ctx)
+	if err != nil {
+		return err
+	}
 
-	var b domain.ReqCreateTask
+	var b ReqCreateTask
 	if err := parseBodyAsJSON(ctx, c.Request(), &b); err != nil {
 		return err
 	}
 
-	task, err := h.usecase.Store(ctx, &b)
+	task, err := h.usecase.Store(ctx, uid, b.Title)
 	if err != nil {
 		return err
 	}
-	return c.JSON(200, task)
+	return c.JSON(200, toResp(&task, fillRespTask))
 }
 
 func (h TaskHandler) DeleteTask(c echo.Context, taskID domain.TaskID) error {
 	ctx := c.Request().Context()
+	uid, err := ctxGetUserID(ctx)
+	if err != nil {
+		return err
+	}
 
-	err := h.usecase.Delete(ctx, 0, taskID)
+	err = h.usecase.Delete(ctx, uid, taskID)
 	if err != nil {
 		return err
 	}
@@ -59,20 +79,28 @@ func (h TaskHandler) GetTask(c echo.Context, taskID domain.TaskID) error {
 	if err != nil {
 		return err
 	}
-	return c.JSON(200, task)
+	return c.JSON(200, toResp(&task, fillRespTask))
 }
 
 func (h TaskHandler) PatchTask(c echo.Context, taskID domain.TaskID) error {
 	ctx := c.Request().Context()
+	uid, err := ctxGetUserID(ctx)
+	if err != nil {
+		return err
+	}
 
-	var b domain.ReqPatchTask
+	var b ReqPatchTask
 	if err := parseBodyAsJSON(ctx, c.Request(), &b); err != nil {
 		return err
 	}
 
-	task, err := h.usecase.Patch(ctx, 0, taskID, &b)
+	patch := domain.TaskPatch{
+		Title: b.Title,
+		Done:  b.Done,
+	}
+	task, err := h.usecase.Patch(ctx, uid, taskID, patch)
 	if err != nil {
 		return err
 	}
-	return c.JSON(200, task)
+	return c.JSON(200, toResp(&task, fillRespTask))
 }
