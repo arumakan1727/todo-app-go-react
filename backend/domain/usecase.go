@@ -1,9 +1,5 @@
 package domain
 
-import "context"
-
-type ctx = context.Context
-
 type UserUsecase interface {
 	List(ctx) (UserList, error)
 	Store(ctx, *ReqCreateUser) (User, error)
