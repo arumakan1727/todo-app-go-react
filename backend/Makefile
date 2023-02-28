@@ -21,6 +21,11 @@ fmt:	## Format and overwrite files
 generate/from-swagger:	## Generate codes from swagger.yaml
 	go generate ./domain/ ./presenter/rest/
 
+.PHONY:	generate/from-pgsql-schema
+generate/from-pgsql-schema:	## Generate codes from swagger.yaml
+	go generate ./repository/pgsql/
+	./_scripts/after-sqlc-generate.sh
+
 .PHONY:	lint/go
 lint/go:	## Lint golang source codes
 	golangci-lint run ./...
@@ -28,4 +33,4 @@ lint/go:	## Lint golang source codes
 .PHONY:	help
 help:	## Show Makefile tasks
 	@grep -E '^[a-zA-Z_/-]+:.*##' Makefile | \
-		awk 'BEGIN {FS = ":.*##\\s*"}; {printf "$(CYAN)%-20s$(RESET) %s\n", $$1, $$2}'
+		awk 'BEGIN {FS = ":.*##\\s*"}; {printf "$(CYAN)%-26s$(RESET) %s\n", $$1, $$2}'

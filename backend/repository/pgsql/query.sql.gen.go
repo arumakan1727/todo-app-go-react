@@ -8,13 +8,15 @@ package pgsql
 import (
 	"context"
 	"time"
+
+	"github.com/arumakan1727/todo-app-go-react/domain"
 )
 
 const deleteTask = `-- name: DeleteTask :exec
 delete from tasks where id = $1
 `
 
-func (q *Queries) DeleteTask(ctx context.Context, id uint64) error {
+func (q *Queries) DeleteTask(ctx context.Context, id domain.TaskID) error {
 	_, err := q.db.ExecContext(ctx, deleteTask, id)
 	return err
 }
@@ -23,9 +25,9 @@ const getTask = `-- name: GetTask :one
 select id, user_id, title, done, created_at from tasks where id = $1 limit 1
 `
 
-func (q *Queries) GetTask(ctx context.Context, id uint64) (Task, error) {
+func (q *Queries) GetTask(ctx context.Context, id domain.TaskID) (domain.TaskEntity, error) {
 	row := q.db.QueryRowContext(ctx, getTask, id)
-	var i Task
+	var i domain.TaskEntity
 	err := row.Scan(
 		&i.ID,
 		&i.UserID,
@@ -40,9 +42,9 @@ const getUserByEmail = `-- name: GetUserByEmail :one
 select id, role, email, passwd_hash, display_name, created_at from users where email = $1 limit 1
 `
 
-func (q *Queries) GetUserByEmail(ctx context.Context, email string) (User, error) {
+func (q *Queries) GetUserByEmail(ctx context.Context, email string) (domain.UserEntity, error) {
 	row := q.db.QueryRowContext(ctx, getUserByEmail, email)
-	var i User
+	var i domain.UserEntity
 	err := row.Scan(
 		&i.ID,
 		&i.Role,
@@ -61,9 +63,9 @@ insert into tasks (
 `
 
 type InsertTaskParams struct {
-	UserID    int32     `db:"user_id"`
-	Title     string    `db:"title"`
-	CreatedAt time.Time `db:"created_at"`
+	UserID    domain.UserID `db:"user_id"`
+	Title     string        `db:"title"`
+	CreatedAt time.Time     `db:"created_at"`
 }
 
 func (q *Queries) InsertTask(ctx context.Context, arg InsertTaskParams) error {
@@ -101,10 +103,10 @@ from users
 `
 
 type ListUsersRow struct {
-	ID          uint64    `db:"id"`
-	Email       string    `db:"email"`
-	DisplayName string    `db:"display_name"`
-	CreatedAt   time.Time `db:"created_at"`
+	ID          domain.UserID `db:"id"`
+	Email       string        `db:"email"`
+	DisplayName string        `db:"display_name"`
+	CreatedAt   time.Time     `db:"created_at"`
 }
 
 func (q *Queries) ListUsers(ctx context.Context) ([]ListUsersRow, error) {

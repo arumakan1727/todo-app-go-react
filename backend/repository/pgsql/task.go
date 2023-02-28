@@ -13,7 +13,7 @@ func (q *Queries) ListTasksFilterByStatus(
 	ctx context.Context,
 	userID int32,
 	done domain.TaskStatusFilter,
-) ([]*Task, error) {
+) ([]domain.TaskEntity, error) {
 	query := `select id, title, done, created_at where user_id=$1 `
 
 	switch done {
@@ -25,11 +25,11 @@ func (q *Queries) ListTasksFilterByStatus(
 		query += " AND done=false"
 	}
 
-	tasks := make([]*Task, 0, 5)
 	rows, err := q.db.QueryContext(ctx, query, userID)
 	if err != nil {
 		return nil, err
 	}
+	tasks := make([]domain.TaskEntity, 0, 5)
 	if err := sqlx.StructScan(rows, tasks); err != nil {
 		return nil, err
 	}
@@ -38,10 +38,10 @@ func (q *Queries) ListTasksFilterByStatus(
 
 func (q *Queries) PatchTask(
 	ctx context.Context,
-	taskID int32,
-	userID int32,
+	taskID domain.TaskID,
+	userID domain.UserID,
 	p *domain.ReqPatchTask,
-) (*Task, error) {
+) (domain.TaskEntity, error) {
 	query := `UPDATE tasks SET `
 	qParts := []string{}
 	args := []any{taskID, userID}
@@ -54,8 +54,8 @@ func (q *Queries) PatchTask(
 		args = append(args, p.Done)
 		qParts = append(qParts, fmt.Sprintf("done = $%d", len(args)))
 	}
-	if len(args) <= 0 {
-		return nil, ErrNoFieldsUpdate
+	if len(args) == 0 {
+		return domain.TaskEntity{}, ErrNoFieldsUpdate
 	}
 
 	query += strings.Join(qParts, ", ")
@@ -64,13 +64,15 @@ func (q *Queries) PatchTask(
 
 	row := q.db.QueryRowContext(ctx, query, args...)
 	if err := row.Err(); err != nil {
-		return nil, err
+		return domain.TaskEntity{}, err
 	}
 
-	t := Task{
+	t := domain.TaskEntity{
 		ID:     taskID,
 		UserID: userID,
 	}
-	row.Scan(&t.Title, &t.Done, &t.CreatedAt)
-	return &t, nil
+	if err := row.Scan(&t.Title, &t.Done, &t.CreatedAt); err != nil {
+		return domain.TaskEntity{}, err
+	}
+	return t, nil
 }

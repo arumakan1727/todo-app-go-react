@@ -2,22 +2,22 @@
 // versions:
 //   sqlc v1.17.2
 
-package pgsql
+package domain
 
 import (
 	"time"
 )
 
-type Task struct {
-	ID        uint64    `db:"id"`
-	UserID    int32     `db:"user_id"`
+type TaskEntity struct {
+	ID        TaskID    `db:"id"`
+	UserID    UserID    `db:"user_id"`
 	Title     string    `db:"title"`
 	Done      bool      `db:"done"`
 	CreatedAt time.Time `db:"created_at"`
 }
 
-type User struct {
-	ID          uint64    `db:"id"`
+type UserEntity struct {
+	ID          UserID    `db:"id"`
 	Role        string    `db:"role"`
 	Email       string    `db:"email"`
 	PasswdHash  []byte    `db:"passwd_hash"`
