@@ -3,6 +3,7 @@ module github.com/arumakan1727/todo-app-go-react
 go 1.20
 
 require (
+	github.com/caarlos0/env/v7 v7.0.0
 	github.com/deepmap/oapi-codegen v1.12.4
 	github.com/jmoiron/sqlx v1.3.5
 	github.com/kyleconroy/sqlc v1.17.2
