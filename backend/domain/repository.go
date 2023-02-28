@@ -1,13 +1,13 @@
 package domain
 
 type Repository interface {
-	StoreUser(ctx, *UserEntity) error
-	ListUsers(ctx) ([]UserEntity, error)
-	GetUserByEmail(ctx, Email) (UserEntity, error)
+	StoreUser(Ctx, *User) error
+	ListUsers(Ctx) ([]User, error)
+	GetUserByEmail(Ctx, string) (User, error)
 
-	StoreTask(ctx, *TaskEntity) error
-	ListTasksOfUser(ctx, UserID) ([]TaskEntity, error)
-	GetTask(ctx, UserID, TaskID) (TaskEntity, error)
-	PatchTask(ctx, UserID, *ReqPatchTask) (TaskEntity, error)
-	DeleteTask(ctx, UserID, TaskID) error
+	StoreTask(Ctx, *Task) error
+	ListTasksOfUser(Ctx, UserID) ([]Task, error)
+	GetTask(Ctx, UserID, TaskID) (Task, error)
+	PatchTask(Ctx, UserID, TaskPatch) (Task, error)
+	DeleteTask(Ctx, UserID, TaskID) error
 }

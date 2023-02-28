@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-type TaskEntity struct {
+type Task struct {
 	ID        TaskID    `db:"id"`
 	UserID    UserID    `db:"user_id"`
 	Title     string    `db:"title"`
@@ -16,7 +16,7 @@ type TaskEntity struct {
 	CreatedAt time.Time `db:"created_at"`
 }
 
-type UserEntity struct {
+type User struct {
 	ID          UserID    `db:"id"`
 	Role        string    `db:"role"`
 	Email       string    `db:"email"`

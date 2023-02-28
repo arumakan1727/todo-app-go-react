@@ -6,42 +6,34 @@ import (
 	"strings"
 
 	"github.com/arumakan1727/todo-app-go-react/domain"
-	"github.com/jmoiron/sqlx"
 )
 
-func (q *Queries) ListTasksFilterByStatus(
-	ctx context.Context,
-	userID int32,
-	done domain.TaskStatusFilter,
-) ([]domain.TaskEntity, error) {
+func (r *repository) ListTasks(
+	ctx context.Context, userID domain.UserID, filterDoneEq *bool,
+) ([]domain.Task, error) {
 	query := `select id, title, done, created_at where user_id=$1 `
 
-	switch done {
-	case domain.TaskStatusFilterAny:
-		break // do nothing
-	case domain.TaskStatusFilterDone:
-		query += " AND done=true"
-	case domain.TaskStatusFilterTodo:
-		query += " AND done=false"
+	if filterDoneEq != nil {
+		if *filterDoneEq {
+			query += " AND done=true"
+		} else {
+			query += " AND done=false"
+		}
 	}
 
-	rows, err := q.db.QueryContext(ctx, query, userID)
-	if err != nil {
-		return nil, err
-	}
-	tasks := make([]domain.TaskEntity, 0, 5)
-	if err := sqlx.StructScan(rows, tasks); err != nil {
+	tasks := []domain.Task{}
+	if err := r.dbx.SelectContext(ctx, &tasks, query, userID); err != nil {
 		return nil, err
 	}
 	return tasks, nil
 }
 
-func (q *Queries) PatchTask(
+func (q *repository) PatchTask(
 	ctx context.Context,
-	taskID domain.TaskID,
 	userID domain.UserID,
-	p *domain.ReqPatchTask,
-) (domain.TaskEntity, error) {
+	taskID domain.TaskID,
+	p domain.TaskPatch,
+) (domain.Task, error) {
 	query := `UPDATE tasks SET `
 	qParts := []string{}
 	args := []any{taskID, userID}
@@ -55,24 +47,20 @@ func (q *Queries) PatchTask(
 		qParts = append(qParts, fmt.Sprintf("done = $%d", len(args)))
 	}
 	if len(args) == 0 {
-		return domain.TaskEntity{}, ErrNoFieldsUpdate
+		return domain.Task{}, domain.ErrEmptyPatch
 	}
 
 	query += strings.Join(qParts, ", ")
-	query += `) where id=$1 AND user_id=$2
-	returning (title, done, created_at);`
+	query += `) where id=$1 AND user_id=$2 returning *;`
 
-	row := q.db.QueryRowContext(ctx, query, args...)
+	row := q.dbx.QueryRowxContext(ctx, query, args...)
 	if err := row.Err(); err != nil {
-		return domain.TaskEntity{}, err
+		return domain.Task{}, err
 	}
 
-	t := domain.TaskEntity{
-		ID:     taskID,
-		UserID: userID,
-	}
-	if err := row.Scan(&t.Title, &t.Done, &t.CreatedAt); err != nil {
-		return domain.TaskEntity{}, err
+	var t domain.Task
+	if err := row.StructScan(&t); err != nil {
+		return domain.Task{}, err
 	}
 	return t, nil
 }

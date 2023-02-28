@@ -6,7 +6,7 @@ info:
   description: |
     ToDOアプリのAPI仕様定義です。
   contact:
-    name: Arumakan1727
+    name: arumakan1727
     url: "https://github.com/arumakan1727"
   license:
     name: MIT
@@ -48,7 +48,7 @@ paths:
           description: OK
           content:
             application/json:
-              schema: { $ref: "#/components/schemas/AuthToken" }
+              schema: { $ref: "#/components/schemas/RespAuthToken" }
         "401":
           description: incorrect email or password
   /tasks:
@@ -63,13 +63,12 @@ paths:
           required: false
           schema:
             $ref: "#/components/schemas/TaskStatusFilter"
-            default: todo
       responses:
         "200":
           description: OK
           content:
             application/json:
-              schema: { $ref: "#/components/schemas/TaskList" }
+              schema: { $ref: "#/components/schemas/RespTaskList" }
         "401":
           $ref: "#/components/responses/Resp401MissingOrInvalidToken"
     post:
@@ -153,7 +152,7 @@ paths:
           description: OK
           content:
             application/json:
-              schema: { $ref: "#/components/schemas/UserList" }
+              schema: { $ref: "#/components/schemas/RespUserList" }
         "404":
           $ref: "#/components/responses/Resp404NotFoundOrUnauthorizedOrForbidden"
 components:
@@ -162,6 +161,16 @@ components:
       type: http
       scheme: bearer
   schemas:
+    # ----- IDs -----
+    UserID:
+      type: integer
+      x-go-type: domain.UserID
+      x-go-type-import:
+        path: "github.com/arumakan1727/todo-app-go-react/domain"
+    TaskID:
+      type: integer
+      x-go-type: domain.TaskID
+
     # ----- auth -----
     Password:
       type: string
@@ -176,23 +185,19 @@ components:
         email: { type: string, format: email }
         password: { $ref: "#/components/schemas/Password" }
 
-    AuthToken:
+    RespAuthToken:
       type: object
       required: [accessToken, hoge]
       properties:
         accessToken: { type: string }
 
     # ----- task -----
-    TaskID:
-      type: integer
-      x-go-type: uint64
-
     TaskTitle:
       type: string
       minLength: 1
       maxLength: 40
 
-    Task:
+    RespTask:
       type: object
       required: [id, title, done, createdAt]
       properties:
@@ -201,12 +206,12 @@ components:
         done: { type: boolean }
         createdAt: { type: string, format: date-time }
 
-    TaskList:
+    RespTaskList:
       type: object
       required: [totalCount, items]
       properties:
         totalCount: { type: integer }
-        items: { type: array, items: { $ref: "#/components/schemas/Task" } }
+        items: { type: array, items: { $ref: "#/components/schemas/RespTask" } }
 
     TaskStatusFilter:
       description: タスクの完了状態のフィルタリング指定
@@ -226,11 +231,7 @@ components:
         done: { type: boolean }
 
     # ----- user -----
-    UserID:
-      type: integer
-      x-go-type: uint64
-
-    User:
+    RespUser:
       type: object
       required: [id, email, displayName, createdAt]
       properties:
@@ -239,12 +240,12 @@ components:
         displayName: { type: string }
         createdAt: { type: string, format: date-time }
 
-    UserList:
+    RespUserList:
       type: object
       required: [totalCount, items]
       properties:
         totalCount: { type: integer }
-        items: { type: array, items: { $ref: "#/components/schemas/User" } }
+        items: { type: array, items: { $ref: "#/components/schemas/RespUser" } }
 
     ReqCreateUser:
       type: object
@@ -260,7 +261,7 @@ components:
       description: OK (returning a task)
       content:
         application/json:
-          schema: { $ref: "#/components/schemas/Task" }
+          schema: { $ref: "#/components/schemas/RespTask" }
     Resp401MissingOrInvalidToken:
       description: Missing or invalid access token.
       content:

@@ -5,7 +5,7 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-type UserHandler gHandler[domain.UserUsecase]
+type UserHandler gHandler[domain.UserUcase]
 
 func (h UserHandler) ListUsersForAdmin(c echo.Context) error {
 	ctx := c.Request().Context()

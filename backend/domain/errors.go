@@ -9,5 +9,7 @@ var (
 
 	ErrConflict = errors.New("item already exist")
 
+	ErrEmptyPatch = errors.New("no fields specified to patch")
+
 	ErrInvalidInput = errors.New("given param is invalid")
 )

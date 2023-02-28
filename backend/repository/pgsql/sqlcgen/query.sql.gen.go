@@ -3,7 +3,7 @@
 //   sqlc v1.17.2
 // source: query.sql
 
-package pgsql
+package sqlcgen
 
 import (
 	"context"
@@ -25,9 +25,9 @@ const getTask = `-- name: GetTask :one
 select id, user_id, title, done, created_at from tasks where id = $1 limit 1
 `
 
-func (q *Queries) GetTask(ctx context.Context, id domain.TaskID) (domain.TaskEntity, error) {
+func (q *Queries) GetTask(ctx context.Context, id domain.TaskID) (domain.Task, error) {
 	row := q.db.QueryRowContext(ctx, getTask, id)
-	var i domain.TaskEntity
+	var i domain.Task
 	err := row.Scan(
 		&i.ID,
 		&i.UserID,
@@ -42,9 +42,9 @@ const getUserByEmail = `-- name: GetUserByEmail :one
 select id, role, email, passwd_hash, display_name, created_at from users where email = $1 limit 1
 `
 
-func (q *Queries) GetUserByEmail(ctx context.Context, email string) (domain.UserEntity, error) {
+func (q *Queries) GetUserByEmail(ctx context.Context, email string) (domain.User, error) {
 	row := q.db.QueryRowContext(ctx, getUserByEmail, email)
-	var i domain.UserEntity
+	var i domain.User
 	err := row.Scan(
 		&i.ID,
 		&i.Role,

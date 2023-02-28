@@ -5,7 +5,7 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-type AuthTokenHandler gHandler[domain.AuthTokenUsecase]
+type AuthTokenHandler gHandler[domain.AuthTokenUcase]
 
 func (h AuthTokenHandler) CreateAuthToken(c echo.Context) error {
 	ctx := c.Request().Context()
@@ -19,5 +19,7 @@ func (h AuthTokenHandler) CreateAuthToken(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	return c.JSON(200, tok)
+	return c.JSON(200, domain.RespAuthToken{
+		AccessToken: string(tok),
+	})
 }

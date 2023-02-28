@@ -5,7 +5,7 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-type TaskHandler gHandler[domain.TaskUsecase]
+type TaskHandler gHandler[domain.TaskUcase]
 
 func (h TaskHandler) ListTasks(c echo.Context, params domain.ListTasksParams) error {
 	ctx := c.Request().Context()
@@ -13,6 +13,16 @@ func (h TaskHandler) ListTasks(c echo.Context, params domain.ListTasksParams) er
 	list, err := h.usecase.List(ctx, params)
 	if err != nil {
 		return err
+	}
+
+	res := make([]domain.RespTask, 0, len(list))
+	for _, t := range list {
+		res = append(res, domain.RespTask{
+			CreatedAt: time.Time{},
+			Done:      false,
+			Id:        0,
+			Title:     "",
+		})
 	}
 	return c.JSON(200, list)
 }

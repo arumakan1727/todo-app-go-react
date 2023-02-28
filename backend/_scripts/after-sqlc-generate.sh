@@ -2,25 +2,22 @@
 set -euo pipefail
 
 top_dir=$(realpath --relative-to="$(pwd)" "$(go list -m -f '{{.Dir}}')")
-dir_sql="${top_dir}/repository/pgsql"
+dir_sqlc="${top_dir}/repository/pgsql/sqlcgen"
 dir_domain="${top_dir}/domain"
 entity_go="${dir_domain}/entity.gen.go"
 
-if [ -e "${dir_sql}/models.gen.go" ]; then
-  mv -fv "${dir_sql}/models.gen.go" "$entity_go"
+if [ -e "${dir_sqlc}/models.gen.go" ]; then
+  mv -fv "${dir_sqlc}/models.gen.go" "$entity_go"
 fi
 
-TYPE_SUFFIX='Entity'
-
-# $TYPE_SUFFIX がまだついていない構造体型名にのみ $TYPE_SUFFIX を付与
-# パッケージ名も domain へ変更する
-perl -i -pe 's/^type (?!\w+'"$TYPE_SUFFIX"')(\w+)/type \1'"$TYPE_SUFFIX"'/; s/^package (\w)+/package domain/' "$entity_go"
+# パッケージ名を domain へ変更する
+sed -i -E 's/^package (\w)+/package domain/' "$entity_go"
 
 # `type {...}$TYPE_SUFFIX struct` の {...} を抽出
-typenames=$(sed -nE 's/^type (\w+)'"$TYPE_SUFFIX"' struct.*/\1/p' "$entity_go")
+typenames=$(sed -nE 's/^type (\w+) struct.*/\1/p' "$entity_go")
 
 # 改行区切りの $typenames を '|' で join して正規表現として扱う
-sed -i -E 's/\b('"$(echo -n "$typenames" | tr '\n' '|')"')\b/domain.\1'"$TYPE_SUFFIX"'/g' "$dir_sql"/*sql.gen.go
+sed -i -E 's/\b('"$(echo -n "$typenames" | tr '\n' '|')"')\b/domain.\1/g' "$dir_sqlc"/*sql.gen.go
 echo "[OK] Renamed struct type names"
 
 # domain パッケージのインポートを消し、さらに 'domain.' を消す
