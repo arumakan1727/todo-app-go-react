@@ -1,5 +1,5 @@
 # available config options: https://github.com/deepmap/oapi-codegen/blob/master/pkg/codegen/configuration.go
-package: server
+package: rest
 output: interface.gen.go
 generate:
   echo-server: true

@@ -1,13 +1,13 @@
-package handler
+package rest
 
 import (
 	"github.com/arumakan1727/todo-app-go-react/domain"
 	"github.com/labstack/echo/v4"
 )
 
-type TaskHandler Handler[domain.TaskUsecase]
+type TaskHandler gHandler[domain.TaskUsecase]
 
-func (h *TaskHandler) ListTasks(c echo.Context, params domain.ListTasksParams) error {
+func (h TaskHandler) ListTasks(c echo.Context, params domain.ListTasksParams) error {
 	ctx := c.Request().Context()
 
 	list, err := h.usecase.List(ctx, params)
@@ -17,7 +17,7 @@ func (h *TaskHandler) ListTasks(c echo.Context, params domain.ListTasksParams) e
 	return c.JSON(200, list)
 }
 
-func (h *TaskHandler) CreateTask(c echo.Context) error {
+func (h TaskHandler) CreateTask(c echo.Context) error {
 	ctx := c.Request().Context()
 
 	var b domain.ReqCreateTask
@@ -32,7 +32,7 @@ func (h *TaskHandler) CreateTask(c echo.Context) error {
 	return c.JSON(200, task)
 }
 
-func (h *TaskHandler) DeleteTask(c echo.Context, taskID domain.TaskID) error {
+func (h TaskHandler) DeleteTask(c echo.Context, taskID domain.TaskID) error {
 	ctx := c.Request().Context()
 
 	err := h.usecase.Delete(ctx, 0, taskID)
@@ -42,7 +42,7 @@ func (h *TaskHandler) DeleteTask(c echo.Context, taskID domain.TaskID) error {
 	return c.String(200, "deleted")
 }
 
-func (h *TaskHandler) GetTask(c echo.Context, taskID domain.TaskID) error {
+func (h TaskHandler) GetTask(c echo.Context, taskID domain.TaskID) error {
 	ctx := c.Request().Context()
 
 	task, err := h.usecase.Get(ctx, 0, taskID)
@@ -52,7 +52,7 @@ func (h *TaskHandler) GetTask(c echo.Context, taskID domain.TaskID) error {
 	return c.JSON(200, task)
 }
 
-func (h *TaskHandler) PatchTask(c echo.Context, taskID domain.TaskID) error {
+func (h TaskHandler) PatchTask(c echo.Context, taskID domain.TaskID) error {
 	ctx := c.Request().Context()
 
 	var b domain.ReqPatchTask

@@ -1,11 +1,11 @@
-package handler
+package rest
 
 import (
 	"github.com/arumakan1727/todo-app-go-react/domain"
 	"github.com/labstack/echo/v4"
 )
 
-type UserHandler Handler[domain.UserUsecase]
+type UserHandler gHandler[domain.UserUsecase]
 
 func (h UserHandler) ListUsersForAdmin(c echo.Context) error {
 	ctx := c.Request().Context()
