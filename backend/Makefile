@@ -19,7 +19,7 @@ fmt:	## Format and overwrite files
 
 .PHONY:	gen/from-swagger
 gen/from-swagger:	## Generate codes from swagger.yaml
-	go generate ./presenter/rest/
+	go generate ./presenter/restapi/
 
 .PHONY:	gen/from-pgsql-schema
 gen/from-pgsql-schema:	## Generate codes from swagger.yaml

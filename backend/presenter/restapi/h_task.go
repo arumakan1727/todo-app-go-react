@@ -1,4 +1,4 @@
-package rest
+package restapi
 
 import (
 	"github.com/arumakan1727/todo-app-go-react/domain"

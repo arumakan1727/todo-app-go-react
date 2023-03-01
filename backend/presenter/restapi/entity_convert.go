@@ -1,4 +1,4 @@
-package rest
+package restapi
 
 func toResp[RESP any, SRC any](src *SRC, fill func(*RESP, *SRC)) RESP {
 	var r RESP

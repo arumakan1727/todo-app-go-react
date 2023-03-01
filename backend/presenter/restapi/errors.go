@@ -1,4 +1,4 @@
-package rest
+package restapi
 
 import "github.com/labstack/echo/v4"
 
