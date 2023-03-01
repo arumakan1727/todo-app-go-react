@@ -6,7 +6,9 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-type UserHandler gHandler[domain.UserUcase]
+type UserHandler struct {
+	usecase domain.UserUcase
+}
 
 func fillRespUser(r *RespUser, u *domain.User) {
 	r.CreatedAt = u.CreatedAt
@@ -15,8 +17,9 @@ func fillRespUser(r *RespUser, u *domain.User) {
 	r.Id = u.ID
 }
 
-func (h UserHandler) ListUsersForAdmin(c echo.Context) error {
+func (h UserHandler) ListUsersForAdmin(c echo.Context, clientUID UserID) error {
 	ctx := c.Request().Context()
+	c.Request().Context()
 
 	xs, err := h.usecase.List(ctx)
 	if err != nil {

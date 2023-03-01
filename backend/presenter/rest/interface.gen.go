@@ -4,6 +4,7 @@
 package rest
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 
@@ -15,46 +16,50 @@ import (
 type ServerInterface interface {
 
 	// (GET /__/users)
-	ListUsersForAdmin(ctx echo.Context) error
+	ListUsersForAdmin(c echo.Context, clientUID UserID) error
 
 	// (POST /authtoken/new)
-	CreateAuthToken(ctx echo.Context) error
+	CreateAuthToken(c echo.Context) error
 
 	// (GET /ping)
-	GetPing(ctx echo.Context) error
+	GetPing(c echo.Context) error
 
 	// (GET /tasks)
-	ListTasks(ctx echo.Context, params ListTasksParams) error
+	ListTasks(c echo.Context, clientUID UserID, params ListTasksParams) error
 
 	// (POST /tasks)
-	CreateTask(ctx echo.Context) error
+	CreateTask(c echo.Context, clientUID UserID) error
 
 	// (DELETE /tasks/{taskID})
-	DeleteTask(ctx echo.Context, taskID TaskID) error
+	DeleteTask(c echo.Context, clientUID UserID, taskID TaskID) error
 
 	// (GET /tasks/{taskID})
-	GetTask(ctx echo.Context, taskID TaskID) error
+	GetTask(c echo.Context, clientUID UserID, taskID TaskID) error
 
 	// (PATCH /tasks/{taskID})
-	PatchTask(ctx echo.Context, taskID TaskID) error
+	PatchTask(c echo.Context, clientUID UserID, taskID TaskID) error
 
 	// (POST /users)
-	CreateUser(ctx echo.Context) error
+	CreateUser(c echo.Context) error
 }
 
 // ServerInterfaceWrapper converts echo contexts to parameters.
 type ServerInterfaceWrapper struct {
-	Handler ServerInterface
+	Handler             ServerInterface
+	GetClientUIDFromCtx func(context.Context) (UserID, error)
 }
 
 // ListUsersForAdmin converts echo context to params.
 func (w *ServerInterfaceWrapper) ListUsersForAdmin(ctx echo.Context) error {
 	var err error
 
-	ctx.Set(AccessTokenScopes, []string{""})
+	var clientUID UserID
+	if clientUID, err = w.GetClientUIDFromCtx(ctx.Request().Context()); err != nil {
+		return err
+	}
 
 	// Invoke the callback with all the unmarshalled arguments
-	err = w.Handler.ListUsersForAdmin(ctx)
+	err = w.Handler.ListUsersForAdmin(ctx, clientUID)
 	return err
 }
 
@@ -71,8 +76,6 @@ func (w *ServerInterfaceWrapper) CreateAuthToken(ctx echo.Context) error {
 func (w *ServerInterfaceWrapper) GetPing(ctx echo.Context) error {
 	var err error
 
-	ctx.Set(AccessTokenScopes, []string{""})
-
 	// Invoke the callback with all the unmarshalled arguments
 	err = w.Handler.GetPing(ctx)
 	return err
@@ -82,7 +85,10 @@ func (w *ServerInterfaceWrapper) GetPing(ctx echo.Context) error {
 func (w *ServerInterfaceWrapper) ListTasks(ctx echo.Context) error {
 	var err error
 
-	ctx.Set(AccessTokenScopes, []string{""})
+	var clientUID UserID
+	if clientUID, err = w.GetClientUIDFromCtx(ctx.Request().Context()); err != nil {
+		return err
+	}
 
 	// Parameter object where we will unmarshal all parameters from the context
 	var params ListTasksParams
@@ -94,7 +100,7 @@ func (w *ServerInterfaceWrapper) ListTasks(ctx echo.Context) error {
 	}
 
 	// Invoke the callback with all the unmarshalled arguments
-	err = w.Handler.ListTasks(ctx, params)
+	err = w.Handler.ListTasks(ctx, clientUID, params)
 	return err
 }
 
@@ -102,10 +108,13 @@ func (w *ServerInterfaceWrapper) ListTasks(ctx echo.Context) error {
 func (w *ServerInterfaceWrapper) CreateTask(ctx echo.Context) error {
 	var err error
 
-	ctx.Set(AccessTokenScopes, []string{""})
+	var clientUID UserID
+	if clientUID, err = w.GetClientUIDFromCtx(ctx.Request().Context()); err != nil {
+		return err
+	}
 
 	// Invoke the callback with all the unmarshalled arguments
-	err = w.Handler.CreateTask(ctx)
+	err = w.Handler.CreateTask(ctx, clientUID)
 	return err
 }
 
@@ -120,10 +129,13 @@ func (w *ServerInterfaceWrapper) DeleteTask(ctx echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter taskID: %s", err))
 	}
 
-	ctx.Set(AccessTokenScopes, []string{""})
+	var clientUID UserID
+	if clientUID, err = w.GetClientUIDFromCtx(ctx.Request().Context()); err != nil {
+		return err
+	}
 
 	// Invoke the callback with all the unmarshalled arguments
-	err = w.Handler.DeleteTask(ctx, taskID)
+	err = w.Handler.DeleteTask(ctx, clientUID, taskID)
 	return err
 }
 
@@ -138,10 +150,13 @@ func (w *ServerInterfaceWrapper) GetTask(ctx echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter taskID: %s", err))
 	}
 
-	ctx.Set(AccessTokenScopes, []string{""})
+	var clientUID UserID
+	if clientUID, err = w.GetClientUIDFromCtx(ctx.Request().Context()); err != nil {
+		return err
+	}
 
 	// Invoke the callback with all the unmarshalled arguments
-	err = w.Handler.GetTask(ctx, taskID)
+	err = w.Handler.GetTask(ctx, clientUID, taskID)
 	return err
 }
 
@@ -156,10 +171,13 @@ func (w *ServerInterfaceWrapper) PatchTask(ctx echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter taskID: %s", err))
 	}
 
-	ctx.Set(AccessTokenScopes, []string{""})
+	var clientUID UserID
+	if clientUID, err = w.GetClientUIDFromCtx(ctx.Request().Context()); err != nil {
+		return err
+	}
 
 	// Invoke the callback with all the unmarshalled arguments
-	err = w.Handler.PatchTask(ctx, taskID)
+	err = w.Handler.PatchTask(ctx, clientUID, taskID)
 	return err
 }
 
