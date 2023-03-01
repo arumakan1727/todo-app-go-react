@@ -21,14 +21,14 @@ func (h TaskHandler) ListTasks(
 ) error {
 	ctx := c.Request().Context()
 
-	var filterDoneEq *bool
+	var f domain.TaskListFilter
 	if params.Status == nil || *params.Status == TaskStatusFilterAny {
-		filterDoneEq = nil
+		f.DoneEq = nil
 	} else {
-		filterDoneEq = new(bool)
-		*filterDoneEq = (*params.Status == TaskStatusFilterDone)
+		f.DoneEq = new(bool)
+		*f.DoneEq = (*params.Status == TaskStatusFilterDone)
 	}
-	xs, err := h.usecase.List(ctx, clientUID, filterDoneEq)
+	xs, err := h.usecase.List(ctx, clientUID, f)
 	if err != nil {
 		return err
 	}

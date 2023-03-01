@@ -15,7 +15,7 @@ func (uc *taskUc) Store(ctx Ctx, uid UserID, title string) (Task, error) {
 	panic("TODO")
 }
 
-func (uc *taskUc) List(ctx Ctx, uid UserID, filterDoneEq *bool) ([]Task, error) {
+func (uc *taskUc) List(ctx Ctx, uid UserID, f TaskListFilter) ([]Task, error) {
 	panic("TODO")
 }
 

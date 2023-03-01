@@ -6,7 +6,7 @@ type Repository interface {
 	GetUserByEmail(Ctx, string) (User, error)
 
 	StoreTask(Ctx, *Task) error
-	ListTasksOfUser(Ctx, UserID) ([]Task, error)
+	ListTasks(Ctx, UserID, TaskListFilter) ([]Task, error)
 	GetTask(Ctx, UserID, TaskID) (Task, error)
 	PatchTask(Ctx, UserID, TaskPatch) (Task, error)
 	DeleteTask(Ctx, UserID, TaskID) error
