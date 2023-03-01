@@ -16,8 +16,8 @@ const deleteTask = `-- name: DeleteTask :exec
 delete from tasks where id = $1
 `
 
-func (q *Queries) DeleteTask(ctx context.Context, id domain.TaskID) error {
-	_, err := q.db.ExecContext(ctx, deleteTask, id)
+func (q *Queries) DeleteTask(ctx context.Context, db DBTX, id domain.TaskID) error {
+	_, err := db.ExecContext(ctx, deleteTask, id)
 	return err
 }
 
@@ -25,8 +25,8 @@ const getTask = `-- name: GetTask :one
 select id, user_id, title, done, created_at from tasks where id = $1 limit 1
 `
 
-func (q *Queries) GetTask(ctx context.Context, id domain.TaskID) (domain.Task, error) {
-	row := q.db.QueryRowContext(ctx, getTask, id)
+func (q *Queries) GetTask(ctx context.Context, db DBTX, id domain.TaskID) (domain.Task, error) {
+	row := db.QueryRowContext(ctx, getTask, id)
 	var i domain.Task
 	err := row.Scan(
 		&i.ID,
@@ -42,8 +42,8 @@ const getUserByEmail = `-- name: GetUserByEmail :one
 select id, role, email, passwd_hash, display_name, created_at from users where email = $1 limit 1
 `
 
-func (q *Queries) GetUserByEmail(ctx context.Context, email string) (domain.User, error) {
-	row := q.db.QueryRowContext(ctx, getUserByEmail, email)
+func (q *Queries) GetUserByEmail(ctx context.Context, db DBTX, email string) (domain.User, error) {
+	row := db.QueryRowContext(ctx, getUserByEmail, email)
 	var i domain.User
 	err := row.Scan(
 		&i.ID,
@@ -68,8 +68,8 @@ type InsertTaskParams struct {
 	CreatedAt time.Time     `db:"created_at"`
 }
 
-func (q *Queries) InsertTask(ctx context.Context, arg InsertTaskParams) error {
-	_, err := q.db.ExecContext(ctx, insertTask, arg.UserID, arg.Title, arg.CreatedAt)
+func (q *Queries) InsertTask(ctx context.Context, db DBTX, arg InsertTaskParams) error {
+	_, err := db.ExecContext(ctx, insertTask, arg.UserID, arg.Title, arg.CreatedAt)
 	return err
 }
 
@@ -86,8 +86,8 @@ type InsertUserParams struct {
 	CreatedAt   time.Time `db:"created_at"`
 }
 
-func (q *Queries) InsertUser(ctx context.Context, arg InsertUserParams) error {
-	_, err := q.db.ExecContext(ctx, insertUser,
+func (q *Queries) InsertUser(ctx context.Context, db DBTX, arg InsertUserParams) error {
+	_, err := db.ExecContext(ctx, insertUser,
 		arg.Email,
 		arg.DisplayName,
 		arg.PasswdHash,
@@ -109,8 +109,8 @@ type ListUsersRow struct {
 	CreatedAt   time.Time     `db:"created_at"`
 }
 
-func (q *Queries) ListUsers(ctx context.Context) ([]ListUsersRow, error) {
-	rows, err := q.db.QueryContext(ctx, listUsers)
+func (q *Queries) ListUsers(ctx context.Context, db DBTX) ([]ListUsersRow, error) {
+	rows, err := db.QueryContext(ctx, listUsers)
 	if err != nil {
 		return nil, err
 	}
