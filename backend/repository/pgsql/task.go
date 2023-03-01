@@ -5,38 +5,47 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/arumakan1727/todo-app-go-react/domain"
+	. "github.com/arumakan1727/todo-app-go-react/domain"
 )
 
+func (r *repository) StoreTask(
+	ctx context.Context, t *Task,
+) error {
+	panic("TODO")
+}
+
 func (r *repository) ListTasks(
-	ctx context.Context, userID domain.UserID, filterDoneEq *bool,
-) ([]domain.Task, error) {
+	ctx context.Context, uid UserID, f TaskListFilter,
+) ([]Task, error) {
 	query := `select id, title, done, created_at where user_id=$1 `
 
-	if filterDoneEq != nil {
-		if *filterDoneEq {
+	if f.DoneEq != nil {
+		if *f.DoneEq {
 			query += " AND done=true"
 		} else {
 			query += " AND done=false"
 		}
 	}
 
-	tasks := []domain.Task{}
-	if err := r.dbx.SelectContext(ctx, &tasks, query, userID); err != nil {
+	tasks := []Task{}
+	if err := r.db.SelectContext(ctx, &tasks, query, uid); err != nil {
 		return nil, err
 	}
 	return tasks, nil
 }
 
-func (q *repository) PatchTask(
-	ctx context.Context,
-	userID domain.UserID,
-	taskID domain.TaskID,
-	p domain.TaskPatch,
-) (domain.Task, error) {
+func (r *repository) GetTask(
+	ctx context.Context, uid UserID, tid TaskID,
+) (Task, error) {
+	panic("TODO")
+}
+
+func (r *repository) PatchTask(
+	ctx context.Context, uid UserID, tid TaskID, p TaskPatch,
+) (Task, error) {
 	query := `UPDATE tasks SET `
 	qParts := []string{}
-	args := []any{taskID, userID}
+	args := []any{tid, uid}
 
 	if p.Title != nil {
 		args = append(args, p.Title)
@@ -47,20 +56,26 @@ func (q *repository) PatchTask(
 		qParts = append(qParts, fmt.Sprintf("done = $%d", len(args)))
 	}
 	if len(args) == 0 {
-		return domain.Task{}, domain.ErrEmptyPatch
+		return Task{}, ErrEmptyPatch
 	}
 
 	query += strings.Join(qParts, ", ")
 	query += `) where id=$1 AND user_id=$2 returning *;`
 
-	row := q.dbx.QueryRowxContext(ctx, query, args...)
+	row := r.db.QueryRowxContext(ctx, query, args...)
 	if err := row.Err(); err != nil {
-		return domain.Task{}, err
+		return Task{}, err
 	}
 
-	var t domain.Task
+	var t Task
 	if err := row.StructScan(&t); err != nil {
-		return domain.Task{}, err
+		return Task{}, err
 	}
 	return t, nil
+}
+
+func (r *repository) DeleteTask(
+	ctx context.Context, uid UserID, tid TaskID,
+) error {
+	panic("TODO")
 }
