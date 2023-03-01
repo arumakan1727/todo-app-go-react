@@ -27,3 +27,4 @@ alter table tasks add constraint "tasks_user_id_fkey"
 
 -- migrate:down
 drop table if exists users, tasks;
+drop extension if exists citext;
