@@ -14,13 +14,13 @@ services:
       - todoapp-db-data:/var/lib/postgresql/data
       - ./db/initdb.d/:/docker-entrypoint-initdb.d:cached
     ports:
-      - "${X_BIND_PORT_POSTGRES:-25432}:5432"
+      - "25432:5432"
 
   redis:
     image: redis:latest
     container_name: "${X_CONTAINER_NAME_REDIS:-todoapp_redis}"
     ports:
-      - "${X_BIND_PORT_REDIS:-26379}:6379"
+      - "26379:6379"
     volumes:
       - todoapp-redis-data:/data
 
