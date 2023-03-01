@@ -56,10 +56,11 @@ func (q *Queries) GetUserByEmail(ctx context.Context, db DBTX, email string) (do
 	return i, err
 }
 
-const insertTask = `-- name: InsertTask :exec
+const insertTask = `-- name: InsertTask :one
 insert into tasks (
    user_id, title, created_at
 ) values ($1, $2, $3)
+returning id
 `
 
 type InsertTaskParams struct {
@@ -68,15 +69,18 @@ type InsertTaskParams struct {
 	CreatedAt time.Time     `db:"created_at"`
 }
 
-func (q *Queries) InsertTask(ctx context.Context, db DBTX, arg InsertTaskParams) error {
-	_, err := db.ExecContext(ctx, insertTask, arg.UserID, arg.Title, arg.CreatedAt)
-	return err
+func (q *Queries) InsertTask(ctx context.Context, db DBTX, arg InsertTaskParams) (domain.TaskID, error) {
+	row := db.QueryRowContext(ctx, insertTask, arg.UserID, arg.Title, arg.CreatedAt)
+	var id domain.TaskID
+	err := row.Scan(&id)
+	return id, err
 }
 
-const insertUser = `-- name: InsertUser :exec
+const insertUser = `-- name: InsertUser :one
 insert into users (
   email, display_name, passwd_hash, created_at
 ) values ($1, $2, $3, $4)
+returning id
 `
 
 type InsertUserParams struct {
@@ -86,14 +90,16 @@ type InsertUserParams struct {
 	CreatedAt   time.Time `db:"created_at"`
 }
 
-func (q *Queries) InsertUser(ctx context.Context, db DBTX, arg InsertUserParams) error {
-	_, err := db.ExecContext(ctx, insertUser,
+func (q *Queries) InsertUser(ctx context.Context, db DBTX, arg InsertUserParams) (domain.UserID, error) {
+	row := db.QueryRowContext(ctx, insertUser,
 		arg.Email,
 		arg.DisplayName,
 		arg.PasswdHash,
 		arg.CreatedAt,
 	)
-	return err
+	var id domain.UserID
+	err := row.Scan(&id)
+	return id, err
 }
 
 const listUsers = `-- name: ListUsers :many

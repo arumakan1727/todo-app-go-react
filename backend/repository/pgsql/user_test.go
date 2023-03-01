@@ -13,13 +13,10 @@ import (
 func TestStoreUser(t *testing.T) {
 	ctx := context.Background()
 	clk := clock.GetFixedClocker(nil)
-	r := newRepositoryForTest(t, ctx, clk, true)
+	r := newRepositoryForTest(t, ctx, clk)
 
 	repoImpl := r.(*repository)
-	_, err := repoImpl.tx_internal.Exec(`DELETE FROM users;`)
-	if err != nil {
-		t.Fatalf("failed to clear `users` table: %#v", err)
-	}
+	clearTable(t, ctx, repoImpl, "users")
 
 	testcase := []struct {
 		in       domain.User
@@ -67,12 +64,13 @@ func TestStoreUser(t *testing.T) {
 		},
 	}
 
-	for _, tt := range testcase {
+	for i, tt := range testcase {
+		t.Logf("testcase #%02d", i+1)
 		var got domain.User = tt.in // copy
 
 		err := r.StoreUser(ctx, &got)
 		tt.checkErr(err)
-		if err != nil {
+		if err == nil {
 			assert.NotZero(t, got.ID)
 			assert.Equal(t, tt.in.Role, got.Role)
 			assert.Equal(t, tt.in.Email, got.Email)

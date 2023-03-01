@@ -27,7 +27,9 @@ func (r *repository) CommitTx(context.Context) error {
 	}
 	r.tx_internal = nil
 	r.db = r.db_internal
-	return tx.Commit()
+
+	err := tx.Commit()
+	return err
 }
 
 func (r *repository) RollbackTx(context.Context) error {
@@ -37,5 +39,7 @@ func (r *repository) RollbackTx(context.Context) error {
 	}
 	r.tx_internal = nil
 	r.db = r.db_internal
-	return tx.Rollback()
+
+	err := tx.Rollback()
+	return err
 }
