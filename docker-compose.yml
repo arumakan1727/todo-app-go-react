@@ -4,9 +4,9 @@ services:
     image: postgres:15.2
     container_name: "${X_CONTAINER_NAME_POSTGRES:-todoapp_postgres}"
     environment:
-      POSTGRES_USER: todoapp
-      POSTGRES_PASSWORD: todoapp
-      POSTGRES_DB: todoapp
+      POSTGRES_USER: todouser
+      POSTGRES_PASSWORD: todopass
+      POSTGRES_DB: tododb
       POSTGRES_INITDB_ARGS: "--encoding=UTF-8"
       POSTGRES_HOST_AUTH_METHOD: trust
       PGDATA: /var/lib/postgresql/data/pgdata
