@@ -5,7 +5,7 @@ import "errors"
 var (
 	ErrNotFound = errors.New("requested item is not found")
 
-	ErrAlreadyExit = errors.New("already exist")
+	ErrAlreadyExits = errors.New("already exists")
 
 	ErrEmptyPatch = errors.New("no fields specified to patch")
 
