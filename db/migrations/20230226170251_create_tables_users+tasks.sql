@@ -25,5 +25,5 @@ alter table tasks add constraint "tasks_user_id_fkey"
   on update cascade
   on delete cascade;
 
--- migrate: down
+-- migrate:down
 drop table if exists users, tasks;
