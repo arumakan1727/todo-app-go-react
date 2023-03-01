@@ -27,6 +27,7 @@ paths:
       operationId: GetPing
       description: 疎通確認用
       tags: [healthcheck]
+      security: []
       responses:
         "200":
           description: Responses "pong".
