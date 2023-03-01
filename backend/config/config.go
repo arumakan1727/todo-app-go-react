@@ -44,8 +44,6 @@ func NewFromEnv() (*Config, error) {
 	return cfg, nil
 }
 
-var testConfig = Config{}
-
 func ForTesting() *Config {
 	return &Config{
 		RunMode:       ModeDebug,
@@ -54,7 +52,7 @@ func ForTesting() *Config {
 		PgSQLPort:     25432,
 		PgSQLUser:     "todouser",
 		PgSQLPasswd:   "todopass",
-		PgSQLDatabase: "tododb",
+		PgSQLDatabase: "tododb__test",
 		RedisHost:     "127.0.0.1",
 		RedisPort:     26379,
 	}
