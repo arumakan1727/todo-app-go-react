@@ -17,12 +17,12 @@ test/verbose:	## Execute all tests with verbose output
 fmt:	## Format and overwrite files
 	go fmt ./...
 
-.PHONY:	generate/from-swagger
-generate/from-swagger:	## Generate codes from swagger.yaml
+.PHONY:	gen/from-swagger
+gen/from-swagger:	## Generate codes from swagger.yaml
 	go generate ./presenter/rest/
 
-.PHONY:	generate/from-pgsql-schema
-generate/from-pgsql-schema:	## Generate codes from swagger.yaml
+.PHONY:	gen/from-pgsql-schema
+gen/from-pgsql-schema:	## Generate codes from swagger.yaml
 	go generate ./repository/pgsql/sqlcgen/
 	./_scripts/after-sqlc-generate.sh
 
@@ -33,4 +33,4 @@ lint/go:	## Lint golang source codes
 .PHONY:	help
 help:	## Show Makefile tasks
 	@grep -E '^[a-zA-Z_/-]+:.*##' Makefile | \
-		awk 'BEGIN {FS = ":.*##\\s*"}; {printf "$(CYAN)%-26s$(RESET) %s\n", $$1, $$2}'
+		awk 'BEGIN {FS = ":.*##\\s*"}; {printf "$(CYAN)%-24s$(RESET) %s\n", $$1, $$2}'
