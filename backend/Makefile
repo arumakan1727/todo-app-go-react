@@ -5,13 +5,21 @@ CYAN     := \033[36m
 MAGENTA  := \033[35m
 RESET    := \033[0m
 
-.PHONY:	test
-test:	## Execute all tests
+.PHONY:	test/all
+test/all:	## Execute all tests
 	go test $(GO_TEST_FLAG) ./...
 
-.PHONY:	test/verbose
-test/verbose:	## Execute all tests with verbose output
-	go test -v $(GO_TEST_FLAG) ./...
+.PHONY:	test/repository
+test/repository:	## Execute tests for ./repository/...
+	go test $(GO_TEST_FLAG) ./repository/...
+
+.PHONY:	test/domain
+test/domain:	## Execute tests for ./domain/...
+	go test $(GO_TEST_FLAG) ./domain/...
+
+.PHONY:	test/presenter
+test/presenter:	## Execute tests for ./presenter/...
+	go test $(GO_TEST_FLAG) ./presenter/...
 
 .PHONY:	fmt
 fmt:	## Format and overwrite files
