@@ -52,7 +52,16 @@ func NewRepository(
 	}
 
 	closer := func() { _ = db.Close() }
-	return newRepo(db, clk), closer, nil
+
+	dbx := sqlx.NewDb(db, "postgres")
+	return &repository{
+		db_internal: dbx,
+		tx_internal: nil,
+
+		db:  dbx,
+		q:   sqlcgen.New(),
+		clk: clk.In(time.UTC),
+	}, closer, nil
 }
 
 func openDB(
@@ -77,16 +86,4 @@ func openDB(
 		return nil, err
 	}
 	return db, nil
-}
-
-func newRepo(db *sql.DB, clk clock.Clocker) *repository {
-	dbx := sqlx.NewDb(db, "postgres")
-	return &repository{
-		db_internal: dbx,
-		tx_internal: nil,
-
-		db:  dbx,
-		q:   sqlcgen.New(),
-		clk: clk,
-	}
 }

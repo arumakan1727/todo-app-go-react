@@ -78,13 +78,14 @@ func (q *Queries) InsertTask(ctx context.Context, db DBTX, arg InsertTaskParams)
 
 const insertUser = `-- name: InsertUser :one
 insert into users (
-  email, display_name, passwd_hash, created_at
-) values ($1, $2, $3, $4)
+  email, role, display_name, passwd_hash, created_at
+) values ($1, $2, $3, $4, $5)
 returning id
 `
 
 type InsertUserParams struct {
 	Email       string    `db:"email"`
+	Role        string    `db:"role"`
 	DisplayName string    `db:"display_name"`
 	PasswdHash  []byte    `db:"passwd_hash"`
 	CreatedAt   time.Time `db:"created_at"`
@@ -93,6 +94,7 @@ type InsertUserParams struct {
 func (q *Queries) InsertUser(ctx context.Context, db DBTX, arg InsertUserParams) (domain.UserID, error) {
 	row := db.QueryRowContext(ctx, insertUser,
 		arg.Email,
+		arg.Role,
 		arg.DisplayName,
 		arg.PasswdHash,
 		arg.CreatedAt,
@@ -104,12 +106,13 @@ func (q *Queries) InsertUser(ctx context.Context, db DBTX, arg InsertUserParams)
 
 const listUsers = `-- name: ListUsers :many
 select
-  id, email, display_name, created_at
+  id, role, email, display_name, created_at
 from users
 `
 
 type ListUsersRow struct {
 	ID          domain.UserID `db:"id"`
+	Role        string        `db:"role"`
 	Email       string        `db:"email"`
 	DisplayName string        `db:"display_name"`
 	CreatedAt   time.Time     `db:"created_at"`
@@ -126,6 +129,7 @@ func (q *Queries) ListUsers(ctx context.Context, db DBTX) ([]ListUsersRow, error
 		var i ListUsersRow
 		if err := rows.Scan(
 			&i.ID,
+			&i.Role,
 			&i.Email,
 			&i.DisplayName,
 			&i.CreatedAt,

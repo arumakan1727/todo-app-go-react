@@ -3,13 +3,13 @@ select * from users where email = $1 limit 1;
 
 -- name: ListUsers :many
 select
-  id, email, display_name, created_at
+  id, role, email, display_name, created_at
 from users;
 
 -- name: InsertUser :one
 insert into users (
-  email, display_name, passwd_hash, created_at
-) values ($1, $2, $3, $4)
+  email, role, display_name, passwd_hash, created_at
+) values ($1, $2, $3, $4, $5)
 returning id;
 
 -- name: GetTask :one
