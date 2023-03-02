@@ -12,7 +12,7 @@ import (
 
 func TestStoreUser(t *testing.T) {
 	ctx := context.Background()
-	clk := clock.GetFixedClocker(nil)
+	clk := clock.GetFixedClocker()
 	r := newRepositoryForTest(t, ctx, clk)
 
 	repoImpl := r.(*repository)
