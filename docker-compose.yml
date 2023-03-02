@@ -12,7 +12,7 @@ services:
       PGDATA: /var/lib/postgresql/data/pgdata
     volumes:
       - todoapp-db-data:/var/lib/postgresql/data
-      - ./db/initdb.d/:/docker-entrypoint-initdb.d:cached
+      - ./backend/_postgres/initdb.d/:/docker-entrypoint-initdb.d:cached
     ports:
       - "25432:5432"
 
