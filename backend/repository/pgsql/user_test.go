@@ -19,10 +19,12 @@ func TestStoreUser(t *testing.T) {
 	clearTable(t, ctx, repoImpl, "users")
 
 	testcase := []struct {
+		name     string
 		in       domain.User
 		checkErr func(got error)
 	}{
 		{
+			name: "success",
 			in: domain.User{
 				ID:          0,
 				Role:        "user",
@@ -36,10 +38,11 @@ func TestStoreUser(t *testing.T) {
 			},
 		},
 		{
+			name: "fail with already existing email (case insentive)",
 			in: domain.User{
 				ID:          0,
 				Role:        "user",
-				Email:       "test@example.com",
+				Email:       "tEsT@example.com",
 				PasswdHash:  []byte("PasswdHash-2"),
 				DisplayName: "DisplayName-2",
 				CreatedAt:   time.Time{},
@@ -50,6 +53,7 @@ func TestStoreUser(t *testing.T) {
 			},
 		},
 		{
+			name: "success with yet un-existing email",
 			in: domain.User{
 				ID:          1727,
 				Role:        "user",
@@ -65,7 +69,7 @@ func TestStoreUser(t *testing.T) {
 	}
 
 	for i, tt := range testcase {
-		t.Logf("testcase #%02d", i+1)
+		t.Logf("testcase-%02d: [Should %s]", i+1, tt.name)
 		var got domain.User = tt.in // copy
 
 		err := r.StoreUser(ctx, &got)
