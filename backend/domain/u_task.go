@@ -1,6 +1,10 @@
 package domain
 
-import "github.com/arumakan1727/todo-app-go-react/optional"
+import (
+	"time"
+
+	"github.com/arumakan1727/todo-app-go-react/optional"
+)
 
 type TaskID uint64
 
@@ -19,4 +23,8 @@ type TaskUcase interface {
 	Get(Ctx, UserID, TaskID) (Task, error)
 	Patch(Ctx, UserID, TaskID, TaskPatch) (Task, error)
 	Delete(Ctx, UserID, TaskID) error
+}
+
+func (t *Task) ApplyTimezone(loc *time.Location) {
+	t.CreatedAt = t.CreatedAt.In(loc)
 }

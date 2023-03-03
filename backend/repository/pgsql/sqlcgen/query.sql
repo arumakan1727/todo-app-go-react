@@ -13,13 +13,13 @@ insert into users (
 returning id;
 
 -- name: GetTask :one
-select * from tasks where id = $1 limit 1;
+select * from tasks where id = $1 and user_id=$2 limit 1;
 
 -- name: InsertTask :one
 insert into tasks (
    user_id, title, created_at
 ) values ($1, $2, $3)
-returning id;
+returning *;
 
--- name: DeleteTask :exec
-delete from tasks where id = $1;
+-- name: DeleteTask :one
+delete from tasks where id = $1 and user_id=$2 returning *;

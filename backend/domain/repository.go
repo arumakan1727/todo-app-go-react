@@ -15,9 +15,9 @@ type Repository interface {
 	ListUsers(Ctx) ([]User, error)
 	GetUserByEmail(Ctx, string) (User, error)
 
-	StoreTask(Ctx, *Task) error
+	StoreTask(ctx Ctx, uid UserID, title string) (Task, error)
 	ListTasks(Ctx, UserID, TaskListFilter) ([]Task, error)
 	GetTask(Ctx, UserID, TaskID) (Task, error)
 	PatchTask(Ctx, UserID, TaskID, TaskPatch) (Task, error)
-	DeleteTask(Ctx, UserID, TaskID) error
+	DeleteTask(Ctx, UserID, TaskID) (Task, error)
 }

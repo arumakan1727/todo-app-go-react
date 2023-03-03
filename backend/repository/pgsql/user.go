@@ -60,6 +60,6 @@ func (r *repository) GetUserByEmail(ctx context.Context, email string) (domain.U
 		}
 		return got, err
 	}
-	got.CreatedAt = got.CreatedAt.In(r.clk.Location())
+	got.ApplyTimezone(r.clk.Location())
 	return got, nil
 }

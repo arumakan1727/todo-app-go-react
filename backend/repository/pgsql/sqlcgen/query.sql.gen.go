@@ -12,21 +12,39 @@ import (
 	"github.com/arumakan1727/todo-app-go-react/domain"
 )
 
-const deleteTask = `-- name: DeleteTask :exec
-delete from tasks where id = $1
+const deleteTask = `-- name: DeleteTask :one
+delete from tasks where id = $1 and user_id=$2 returning id, user_id, title, done, created_at
 `
 
-func (q *Queries) DeleteTask(ctx context.Context, db DBTX, id domain.TaskID) error {
-	_, err := db.ExecContext(ctx, deleteTask, id)
-	return err
+type DeleteTaskParams struct {
+	ID     domain.TaskID `db:"id"`
+	UserID domain.UserID `db:"user_id"`
+}
+
+func (q *Queries) DeleteTask(ctx context.Context, db DBTX, arg DeleteTaskParams) (domain.Task, error) {
+	row := db.QueryRowContext(ctx, deleteTask, arg.ID, arg.UserID)
+	var i domain.Task
+	err := row.Scan(
+		&i.ID,
+		&i.UserID,
+		&i.Title,
+		&i.Done,
+		&i.CreatedAt,
+	)
+	return i, err
 }
 
 const getTask = `-- name: GetTask :one
-select id, user_id, title, done, created_at from tasks where id = $1 limit 1
+select id, user_id, title, done, created_at from tasks where id = $1 and user_id=$2 limit 1
 `
 
-func (q *Queries) GetTask(ctx context.Context, db DBTX, id domain.TaskID) (domain.Task, error) {
-	row := db.QueryRowContext(ctx, getTask, id)
+type GetTaskParams struct {
+	ID     domain.TaskID `db:"id"`
+	UserID domain.UserID `db:"user_id"`
+}
+
+func (q *Queries) GetTask(ctx context.Context, db DBTX, arg GetTaskParams) (domain.Task, error) {
+	row := db.QueryRowContext(ctx, getTask, arg.ID, arg.UserID)
 	var i domain.Task
 	err := row.Scan(
 		&i.ID,
@@ -60,7 +78,7 @@ const insertTask = `-- name: InsertTask :one
 insert into tasks (
    user_id, title, created_at
 ) values ($1, $2, $3)
-returning id
+returning id, user_id, title, done, created_at
 `
 
 type InsertTaskParams struct {
@@ -69,11 +87,17 @@ type InsertTaskParams struct {
 	CreatedAt time.Time     `db:"created_at"`
 }
 
-func (q *Queries) InsertTask(ctx context.Context, db DBTX, arg InsertTaskParams) (domain.TaskID, error) {
+func (q *Queries) InsertTask(ctx context.Context, db DBTX, arg InsertTaskParams) (domain.Task, error) {
 	row := db.QueryRowContext(ctx, insertTask, arg.UserID, arg.Title, arg.CreatedAt)
-	var id domain.TaskID
-	err := row.Scan(&id)
-	return id, err
+	var i domain.Task
+	err := row.Scan(
+		&i.ID,
+		&i.UserID,
+		&i.Title,
+		&i.Done,
+		&i.CreatedAt,
+	)
+	return i, err
 }
 
 const insertUser = `-- name: InsertUser :one
