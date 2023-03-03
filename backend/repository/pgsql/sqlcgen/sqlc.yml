@@ -1,0 +1,22 @@
+# see: https://docs.sqlc.dev/en/stable/reference/config.html
+version: "2"
+sql:
+  - engine: postgresql
+    queries: ./query.sql
+    schema: ./schema.sql
+    gen:
+      go:
+        package: sqlcgen
+        out: .
+        output_db_file_name: db.gen.go
+        output_models_file_name: models.gen.go
+        output_querier_file_name: querier.gen.go
+        output_files_suffix: .gen
+        emit_interface: false
+        emit_db_tags: true
+        emit_methods_with_db_argument: true
+        overrides:
+          - db_type: user_id
+            go_type: github.com/arumakan1727/todo-app-go-react/domain.UserID
+          - db_type: task_id
+            go_type: github.com/arumakan1727/todo-app-go-react/domain.TaskID

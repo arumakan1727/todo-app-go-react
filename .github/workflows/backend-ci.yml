@@ -1,0 +1,80 @@
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - '.github/workflows/backend-test.yml'
+      - 'backend/**'
+  pull_request:
+    paths:
+      - '.github/workflows/backend-test.yml'
+      - 'backend/**'
+
+name: Backend-CI
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: golangci-lint
+        uses: reviewdog/action-golangci-lint@v2
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          workdir: backend/
+          golangci_lint_flags: "--config=./.golangci.yml ./..."
+          fail_on_error: true
+          reporter: "github-pr-review"
+
+  test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:15
+        options: >-
+          --health-cmd "pg_isready"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 25432:5432
+        env:
+          POSTGRES_USER: todouser
+          POSTGRES_PASSWORD: todopass
+          POSTGRES_DB: tododb__test
+          POSTGRES_INITDB_ARGS: --encoding=UTF-8
+          POSTGRES_HOST_AUTH_METHOD: trust
+      redis:
+        image: redis
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 5
+        ports:
+          - 26379:6379
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - uses: actions/setup-go@v3
+      with:
+          go-version-file: backend/go.mod
+
+    - name: Install dbmate and apply migrations
+      env:
+        DATABASE_URL: "postgres://todouser@127.0.0.1:25432/tododb__test?sslmode=disable"
+        DBMATE_MIGRATIONS_DIR: "backend/_postgres/migrations"
+      run: |
+        mkdir -p ~/bin
+        curl -fsSL -o ~/bin/dbmate https://github.com/amacneil/dbmate/releases/latest/download/dbmate-linux-amd64
+        chmod +x ~/bin/dbmate
+        ~/bin/dbmate --version
+        ~/bin/dbmate status && ~/bin/dbmate up
+
+    - name: Run tests with coverage report output
+      run: cd backend && go test ./... -coverprofile=coverage.out
+
+    - name: Report coverage
+      uses: k1LoW/octocov-action@v0
+      with:
+        config: backend/.octocov.yml
