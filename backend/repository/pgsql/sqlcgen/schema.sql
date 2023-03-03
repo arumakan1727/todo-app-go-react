@@ -10,7 +10,7 @@ create table users (
   email         text        not null,
   passwd_hash   bytea       not null,
   display_name  text        not null,
-  created_at    timestamp   not null
+  created_at    timestamptz not null
 );
 
 create table tasks (
@@ -18,5 +18,5 @@ create table tasks (
   user_id       user_id     not null,
   title         text        not null,
   done          boolean     not null,
-  created_at    timestamp   not null
+  created_at    timestamptz not null
 );

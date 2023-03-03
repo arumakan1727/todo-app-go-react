@@ -12,21 +12,39 @@ import (
 	"github.com/arumakan1727/todo-app-go-react/domain"
 )
 
-const deleteTask = `-- name: DeleteTask :exec
-delete from tasks where id = $1
+const deleteTask = `-- name: DeleteTask :one
+delete from tasks where id = $1 and user_id=$2 returning id, user_id, title, done, created_at
 `
 
-func (q *Queries) DeleteTask(ctx context.Context, db DBTX, id domain.TaskID) error {
-	_, err := db.ExecContext(ctx, deleteTask, id)
-	return err
+type DeleteTaskParams struct {
+	ID     domain.TaskID `db:"id"`
+	UserID domain.UserID `db:"user_id"`
+}
+
+func (q *Queries) DeleteTask(ctx context.Context, db DBTX, arg DeleteTaskParams) (domain.Task, error) {
+	row := db.QueryRowContext(ctx, deleteTask, arg.ID, arg.UserID)
+	var i domain.Task
+	err := row.Scan(
+		&i.ID,
+		&i.UserID,
+		&i.Title,
+		&i.Done,
+		&i.CreatedAt,
+	)
+	return i, err
 }
 
 const getTask = `-- name: GetTask :one
-select id, user_id, title, done, created_at from tasks where id = $1 limit 1
+select id, user_id, title, done, created_at from tasks where id = $1 and user_id=$2 limit 1
 `
 
-func (q *Queries) GetTask(ctx context.Context, db DBTX, id domain.TaskID) (domain.Task, error) {
-	row := db.QueryRowContext(ctx, getTask, id)
+type GetTaskParams struct {
+	ID     domain.TaskID `db:"id"`
+	UserID domain.UserID `db:"user_id"`
+}
+
+func (q *Queries) GetTask(ctx context.Context, db DBTX, arg GetTaskParams) (domain.Task, error) {
+	row := db.QueryRowContext(ctx, getTask, arg.ID, arg.UserID)
 	var i domain.Task
 	err := row.Scan(
 		&i.ID,
@@ -56,10 +74,11 @@ func (q *Queries) GetUserByEmail(ctx context.Context, db DBTX, email string) (do
 	return i, err
 }
 
-const insertTask = `-- name: InsertTask :exec
+const insertTask = `-- name: InsertTask :one
 insert into tasks (
    user_id, title, created_at
 ) values ($1, $2, $3)
+returning id, user_id, title, done, created_at
 `
 
 type InsertTaskParams struct {
@@ -68,42 +87,56 @@ type InsertTaskParams struct {
 	CreatedAt time.Time     `db:"created_at"`
 }
 
-func (q *Queries) InsertTask(ctx context.Context, db DBTX, arg InsertTaskParams) error {
-	_, err := db.ExecContext(ctx, insertTask, arg.UserID, arg.Title, arg.CreatedAt)
-	return err
+func (q *Queries) InsertTask(ctx context.Context, db DBTX, arg InsertTaskParams) (domain.Task, error) {
+	row := db.QueryRowContext(ctx, insertTask, arg.UserID, arg.Title, arg.CreatedAt)
+	var i domain.Task
+	err := row.Scan(
+		&i.ID,
+		&i.UserID,
+		&i.Title,
+		&i.Done,
+		&i.CreatedAt,
+	)
+	return i, err
 }
 
-const insertUser = `-- name: InsertUser :exec
+const insertUser = `-- name: InsertUser :one
 insert into users (
-  email, display_name, passwd_hash, created_at
-) values ($1, $2, $3, $4)
+  email, role, display_name, passwd_hash, created_at
+) values ($1, $2, $3, $4, $5)
+returning id
 `
 
 type InsertUserParams struct {
 	Email       string    `db:"email"`
+	Role        string    `db:"role"`
 	DisplayName string    `db:"display_name"`
 	PasswdHash  []byte    `db:"passwd_hash"`
 	CreatedAt   time.Time `db:"created_at"`
 }
 
-func (q *Queries) InsertUser(ctx context.Context, db DBTX, arg InsertUserParams) error {
-	_, err := db.ExecContext(ctx, insertUser,
+func (q *Queries) InsertUser(ctx context.Context, db DBTX, arg InsertUserParams) (domain.UserID, error) {
+	row := db.QueryRowContext(ctx, insertUser,
 		arg.Email,
+		arg.Role,
 		arg.DisplayName,
 		arg.PasswdHash,
 		arg.CreatedAt,
 	)
-	return err
+	var id domain.UserID
+	err := row.Scan(&id)
+	return id, err
 }
 
 const listUsers = `-- name: ListUsers :many
 select
-  id, email, display_name, created_at
+  id, role, email, display_name, created_at
 from users
 `
 
 type ListUsersRow struct {
 	ID          domain.UserID `db:"id"`
+	Role        string        `db:"role"`
 	Email       string        `db:"email"`
 	DisplayName string        `db:"display_name"`
 	CreatedAt   time.Time     `db:"created_at"`
@@ -120,6 +153,7 @@ func (q *Queries) ListUsers(ctx context.Context, db DBTX) ([]ListUsersRow, error
 		var i ListUsersRow
 		if err := rows.Scan(
 			&i.ID,
+			&i.Role,
 			&i.Email,
 			&i.DisplayName,
 			&i.CreatedAt,

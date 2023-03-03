@@ -7,7 +7,7 @@ create table users (
   email         citext      not null,
   passwd_hash   bytea       not null,
   display_name  text        not null,
-  created_at    timestamp   not null default current_timestamp
+  created_at    timestamptz not null default current_timestamp
 );
 
 alter table users add constraint "users_email_key" unique (email);
@@ -17,7 +17,7 @@ create table tasks (
   user_id       bigint      not null,
   title         text        not null,
   done          boolean     not null default false,
-  created_at    timestamp   not null default current_timestamp
+  created_at    timestamptz not null default current_timestamp
 );
 
 alter table tasks add constraint "tasks_user_id_fkey"
