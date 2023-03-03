@@ -20,10 +20,14 @@ func newRepositoryForTest(t *testing.T, ctx context.Context, clk clock.Clocker) 
 	return r
 }
 
+// clearTable は TRUNCATE 文を用いてテーブルから全レコードを効率的に削除する。
+// シーケンスもリセットする。
+// 対象のテーブルが FOREIGN KEY によってテーブル A から参照されている場合は、A もクリアする。
 func clearTable(t *testing.T, ctx context.Context, r *repository, table string) {
 	t.Helper()
-	_, err := r.db.ExecContext(ctx, fmt.Sprintf(`DELETE FROM "%s";`, table))
+	query := fmt.Sprintf(`TRUNCATE TABLE "%s" RESTART IDENTITY CASCADE;`, table)
+	_, err := r.db.ExecContext(ctx, query)
 	if err != nil {
-		t.Fatalf(`failed to exec 'DELETE FROM "%s"': %#v`, table, err)
+		t.Fatalf(`failed to exec '%s': %#v`, query, err)
 	}
 }
