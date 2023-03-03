@@ -19,8 +19,8 @@ func (r *repository) ListTasks(
 ) ([]Task, error) {
 	query := `select id, title, done, created_at where user_id=$1 `
 
-	if f.DoneEq != nil {
-		if *f.DoneEq {
+	if doneEq, ok := f.DoneEq.Take(); ok {
+		if doneEq {
 			query += " AND done=true"
 		} else {
 			query += " AND done=false"
@@ -47,12 +47,12 @@ func (r *repository) PatchTask(
 	qParts := []string{}
 	args := []any{tid, uid}
 
-	if p.Title != nil {
-		args = append(args, p.Title)
+	if title, ok := p.Title.Take(); ok {
+		args = append(args, title)
 		qParts = append(qParts, fmt.Sprintf("title = $%d", len(args)))
 	}
-	if p.Done != nil {
-		args = append(args, p.Done)
+	if done, ok := p.Done.Take(); ok {
+		args = append(args, done)
 		qParts = append(qParts, fmt.Sprintf("done = $%d", len(args)))
 	}
 	if len(args) == 0 {

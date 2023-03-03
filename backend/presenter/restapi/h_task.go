@@ -2,6 +2,7 @@ package restapi
 
 import (
 	"github.com/arumakan1727/todo-app-go-react/domain"
+	"github.com/arumakan1727/todo-app-go-react/optional"
 	"github.com/labstack/echo/v4"
 )
 
@@ -23,10 +24,9 @@ func (h TaskHandler) ListTasks(
 
 	var f domain.TaskListFilter
 	if params.Status == nil || *params.Status == TaskStatusFilterAny {
-		f.DoneEq = nil
+		f.DoneEq = optional.None[bool]()
 	} else {
-		f.DoneEq = new(bool)
-		*f.DoneEq = (*params.Status == TaskStatusFilterDone)
+		f.DoneEq = optional.Some(*params.Status == TaskStatusFilterDone)
 	}
 	xs, err := h.usecase.List(ctx, clientUID, f)
 	if err != nil {
@@ -89,8 +89,8 @@ func (h TaskHandler) PatchTask(
 	}
 
 	patch := domain.TaskPatch{
-		Title: b.Title,
-		Done:  b.Done,
+		Title: optional.FromNillable(b.Title),
+		Done:  optional.FromNillable(b.Done),
 	}
 	task, err := h.usecase.Patch(ctx, clientUID, taskID, patch)
 	if err != nil {

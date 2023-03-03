@@ -1,14 +1,16 @@
 package domain
 
+import "github.com/arumakan1727/todo-app-go-react/optional"
+
 type TaskID uint64
 
 type TaskPatch struct {
-	Title *string
-	Done  *bool
+	Title optional.Option[string]
+	Done  optional.Option[bool]
 }
 
 type TaskListFilter struct {
-	DoneEq *bool
+	DoneEq optional.Option[bool]
 }
 
 type TaskUcase interface {
