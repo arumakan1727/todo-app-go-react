@@ -6,6 +6,7 @@ require (
 	github.com/caarlos0/env/v7 v7.0.0
 	github.com/deepmap/oapi-codegen v1.12.4
 	github.com/jmoiron/sqlx v1.3.5
+	github.com/k0kubun/pp/v3 v3.2.0
 	github.com/kyleconroy/sqlc v1.17.2
 	github.com/labstack/echo/v4 v4.9.1
 	github.com/lib/pq v1.10.7
