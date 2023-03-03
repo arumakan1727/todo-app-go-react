@@ -53,10 +53,6 @@ jobs:
         ports:
           - 26379:6379
 
-    env:
-      DATABASE_URL: "postgres://todouser@127.0.0.1:25432/tododb__test?sslmode=disable"
-      DBMATE_MIGRATIONS_DIR: "backend/_postgres/migrations"
-
     steps:
     - uses: actions/checkout@v3
 
@@ -65,6 +61,9 @@ jobs:
           go-version-file: backend/go.mod
 
     - name: Install dbmate and apply migrations
+      env:
+        DATABASE_URL: "postgres://todouser@127.0.0.1:25432/tododb__test?sslmode=disable"
+        DBMATE_MIGRATIONS_DIR: "backend/_postgres/migrations"
       run: |
         mkdir -p ~/bin
         curl -fsSL -o ~/bin/dbmate https://github.com/amacneil/dbmate/releases/latest/download/dbmate-linux-amd64
