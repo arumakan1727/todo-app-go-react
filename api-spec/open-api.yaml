@@ -176,7 +176,7 @@ paths:
 components:
   securitySchemes:
     AuthCookie:
-      name: todoAppAuthToken
+      name: todoApiAuthToken
       type: apiKey
       in: cookie
   schemas:

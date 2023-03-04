@@ -7,7 +7,7 @@ import (
 	"github.com/arumakan1727/todo-app-go-react/config"
 )
 
-const cookieKeyAuthToken = "todoAppAuthToken"
+const cookieKeyAuthToken = "todoApiAuthToken"
 
 func newSecureCookie(
 	name, value string, maxAge time.Duration, runMode config.RunMode,
