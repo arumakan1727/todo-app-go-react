@@ -5,9 +5,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"strings"
-	"time"
 
-	"github.com/arumakan1727/todo-app-go-react/config"
 	"github.com/labstack/echo/v4"
 )
 
@@ -32,19 +30,4 @@ func parseBodyAsJSON(ctx context.Context, r *http.Request, dest interface{}) err
 		return Err400UndecodableJSON
 	}
 	return nil
-}
-
-func newSecureCookie(
-	name, value string, maxAge time.Duration, runMode config.RunMode,
-) *http.Cookie {
-	return &http.Cookie{
-		Name:     name,
-		Value:    value,
-		Path:     "/",
-		Domain:   "",
-		MaxAge:   int(maxAge.Seconds()),
-		Secure:   runMode != config.ModeDebug,
-		HttpOnly: true,
-		SameSite: http.SameSiteStrictMode,
-	}
 }

@@ -7,12 +7,12 @@ import (
 )
 
 type userUc struct {
-	repo              Repository
+	repo Repository
 }
 
 func NewUserUsecase(repo Repository) UserUsecase {
 	return &userUc{
-		repo:              repo,
+		repo: repo,
 	}
 }
 
