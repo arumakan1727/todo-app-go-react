@@ -119,10 +119,7 @@ paths:
       tags: [task]
       responses:
         "200":
-          description: Deleted
-          content:
-            text/plain:
-              schema: { type: string }
+          $ref: "#/components/responses/Resp200Task"
         "404":
           $ref: "#/components/responses/Resp404NotFoundOrUnauthorizedOrForbidden"
   /users:

@@ -59,11 +59,11 @@ func (h TaskHandler) DeleteTask(
 ) error {
 	ctx := c.Request().Context()
 
-	err := h.usecase.Delete(ctx, clientUID, taskID)
+	task, err := h.usecase.Delete(ctx, clientUID, taskID)
 	if err != nil {
 		return err
 	}
-	return c.String(200, "deleted")
+	return c.JSON(200, toResp(&task, fillRespTask))
 }
 
 func (h TaskHandler) GetTask(
