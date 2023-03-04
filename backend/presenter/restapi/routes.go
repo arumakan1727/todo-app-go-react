@@ -7,15 +7,17 @@ import (
 func newHandler() ServerInterfaceWrapper {
 	type allHandler struct {
 		PingHandler
-		UserHandler
-		TaskHandler
+		*AuthTokenHandler
+		*UserHandler
+		*TaskHandler
 	}
 
 	return ServerInterfaceWrapper{
 		Handler: allHandler{
 			PingHandler{},
-			UserHandler{},
-			TaskHandler{},
+			&AuthTokenHandler{},
+			&UserHandler{},
+			&TaskHandler{},
 		},
 	}
 }
