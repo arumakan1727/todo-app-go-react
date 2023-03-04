@@ -17,7 +17,7 @@ type TaskListFilter struct {
 	DoneEq optional.Option[bool]
 }
 
-type TaskUcase interface {
+type TaskUsecase interface {
 	Store(ctx Ctx, uid UserID, title string) (Task, error)
 	List(Ctx, UserID, TaskListFilter) ([]Task, error)
 	Get(Ctx, UserID, TaskID) (Task, error)

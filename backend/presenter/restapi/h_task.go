@@ -7,7 +7,7 @@ import (
 )
 
 type TaskHandler struct {
-	usecase domain.TaskUcase
+	usecase domain.TaskUsecase
 }
 
 func fillRespTask(r *RespTask, t *domain.Task) {

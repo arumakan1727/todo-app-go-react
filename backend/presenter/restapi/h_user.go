@@ -7,7 +7,7 @@ import (
 )
 
 type UserHandler struct {
-	usecase domain.UserUcase
+	usecase domain.UserUsecase
 }
 
 func fillRespUser(r *RespUser, u *domain.User) {

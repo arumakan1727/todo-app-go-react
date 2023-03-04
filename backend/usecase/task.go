@@ -8,7 +8,7 @@ type taskUc struct {
 	repo Repository
 }
 
-func NewTaskUsecase(repo Repository) TaskUcase {
+func NewTaskUsecase(repo Repository) TaskUsecase {
 	return &taskUc{
 		repo: repo,
 	}

@@ -5,7 +5,7 @@ import "time"
 type UserID uint64
 type AuthToken string
 
-type UserUcase interface {
+type UserUsecase interface {
 	Store(ctx Ctx, email, passwd, displayName string) (User, error)
 	List(Ctx) ([]User, error)
 	GetAuthTokenLifeSpan() time.Duration

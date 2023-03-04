@@ -19,7 +19,7 @@ type userUc struct {
 	repo              Repository
 }
 
-func NewUserUsecase(repo Repository, kvs KVS, authTokenLifeSpan time.Duration) UserUcase {
+func NewUserUsecase(repo Repository, kvs KVS, authTokenLifeSpan time.Duration) UserUsecase {
 	return &userUc{
 		authTokenLifeSpan: authTokenLifeSpan,
 		kvs:               kvs,
