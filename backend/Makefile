@@ -27,12 +27,12 @@ test/presenter:	## Execute tests for ./presenter/...
 fmt:	## Format and overwrite files
 	go fmt ./...
 
-.PHONY:	gen/from-swagger
-gen/from-swagger:	## Generate codes from swagger.yaml
+.PHONY:	gen/from-open-api
+gen/from-open-api:	## Generate codes from open-api.yaml
 	go generate ./presenter/restapi/
 
 .PHONY:	gen/from-pgsql-schema
-gen/from-pgsql-schema:	## Generate codes from swagger.yaml
+gen/from-pgsql-schema:	## Generate codes from schema.sql
 	go generate ./repository/pgsql/sqlcgen/
 	./_scripts/after-sqlc-generate.sh
 

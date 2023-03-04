@@ -34,8 +34,8 @@ __docker/down-remove:	## Remove containers and volumes
 	docker compose down --rmi local --volumes --remove-orphans
 
 .PHONY:	lint/spectral
-lint/spectral:	## Lint swagger.yaml
-	spectral lint --ruleset .spectral.yaml -f pretty api-spec/swagger.yaml
+lint/spectral:	## Lint open-api.yaml
+	spectral lint --ruleset .spectral.yaml -f pretty api-spec/open-api.yaml
 
 .PHONY:	help
 help:	## Show Makefile tasks

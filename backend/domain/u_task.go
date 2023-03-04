@@ -22,7 +22,7 @@ type TaskUcase interface {
 	List(Ctx, UserID, TaskListFilter) ([]Task, error)
 	Get(Ctx, UserID, TaskID) (Task, error)
 	Patch(Ctx, UserID, TaskID, TaskPatch) (Task, error)
-	Delete(Ctx, UserID, TaskID) error
+	Delete(Ctx, UserID, TaskID) (Task, error)
 }
 
 func (t *Task) ApplyTimezone(loc *time.Location) {
