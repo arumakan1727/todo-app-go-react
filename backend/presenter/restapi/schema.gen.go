@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	AccessTokenScopes = "accessToken.Scopes"
+	AuthCookieScopes = "AuthCookie.Scopes"
 )
 
 // Defines values for TaskStatusFilter.
@@ -46,11 +46,6 @@ type ReqCreateUser struct {
 type ReqPatchTask struct {
 	Done  *bool      `json:"done,omitempty"`
 	Title *TaskTitle `json:"title,omitempty"`
-}
-
-// RespAuthToken defines model for RespAuthToken.
-type RespAuthToken struct {
-	AccessToken string `json:"accessToken"`
 }
 
 // RespTask defines model for RespTask.
