@@ -31,6 +31,7 @@ func NewServer(
 
 	h := newHandler(cfg.RunMode, repo, a)
 	s.registerRoutes(h)
+	s.setupGlobalMiddleware(cfg)
 
 	return s
 }
@@ -62,4 +63,10 @@ func (s *Server) Run(ctx context.Context, address string) error {
 // Routes は登録済みのルーティング情報の一覧を返す。
 func (s *Server) Routes() []*echo.Route {
 	return s.echo.Routes()
+}
+
+func (s *Server) setupGlobalMiddleware(cfg *config.Config) {
+	s.echo.Use(
+		CORSMiddleware(cfg),
+	)
 }

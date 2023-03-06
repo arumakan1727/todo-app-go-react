@@ -18,6 +18,11 @@ type Config struct {
 	RunMode         RunMode       `env:"TODO_RUN_MODE"`
 	AuthTokenMaxAge time.Duration `env:"TODO_AUTH_TOKEN_MAX_AGE" envDefault:"24h"`
 
+	// CORSで許可するオリジンのリスト。正規表現やワイルドカードには対応していない。
+	// http://localhost*, http://127.0.0.0.1* は AllowLocalhostOrigin で制御するので AllowedOrigins での設定は不要。
+	AllowedOrigins       []string `env:"TODO_ALLOWED_ORIGINS" envDefault:""`
+	AllowLocalhostOrigin bool     `env:"TODO_ALLOW_LOCALHOST_ORIGIN" envDefault:"false"`
+
 	PgSQLURL  string `env:"TODO_PGSQL_URL" envDefault:"postgres://todouser:todopass@127.0.0.1:5432/tododb?sslmode=disable"`
 	RedisAddr string `env:"TODO_REDIS_ADDR" envDefault:"127.0.0.1:6379"`
 }
@@ -43,7 +48,11 @@ func ForTesting() *Config {
 	return &Config{
 		RunMode:         ModeDebug,
 		AuthTokenMaxAge: time.Minute * 1,
-		PgSQLURL:        "postgres://todouser:todopass@127.0.0.1:25432/tododb__test?sslmode=disable",
-		RedisAddr:       "127.0.0.1:26379",
+
+		AllowedOrigins:       []string{},
+		AllowLocalhostOrigin: true,
+
+		PgSQLURL:  "postgres://todouser:todopass@127.0.0.1:25432/tododb__test?sslmode=disable",
+		RedisAddr: "127.0.0.1:26379",
 	}
 }
