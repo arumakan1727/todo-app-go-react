@@ -4,20 +4,22 @@ import (
 	"context"
 	"errors"
 	"fmt"
+
+	"github.com/arumakan1727/todo-app-go-react/domain"
 )
 
-type ctxKeyUserID struct{}
+type ctxKeyAuthMaterial struct{}
 
 var ErrCtxGetValue = errors.New("failed to get value from ctx")
 
-func newCtxWithUserID(ctx context.Context, uid UserID) context.Context {
-	return context.WithValue(ctx, ctxKeyUserID{}, uid)
+func newCtxWithAuthMaterial(ctx context.Context, am domain.AuthMaterial) context.Context {
+	return context.WithValue(ctx, ctxKeyAuthMaterial{}, am)
 }
 
-func getUserIDFromCtx(ctx context.Context) (UserID, error) {
-	v, ok := ctx.Value(ctxKeyUserID{}).(UserID)
+func getAuthMaterialFromCtx(ctx context.Context) (domain.AuthMaterial, error) {
+	am, ok := ctx.Value(ctxKeyAuthMaterial{}).(domain.AuthMaterial)
 	if !ok {
-		return 0, fmt.Errorf("UserID: %w", ErrCtxGetValue)
+		return am, fmt.Errorf("getAuthMaterialFromCtx: %w", ErrCtxGetValue)
 	}
-	return v, nil
+	return am, nil
 }

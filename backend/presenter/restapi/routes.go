@@ -26,7 +26,7 @@ func newHandler(
 			&UserHandler{userUc},
 			&TaskHandler{taskUc},
 		},
-		GetClientUIDFromCtx: getUserIDFromCtx,
+		GetClientAuthFromCtx: getAuthMaterialFromCtx,
 	}
 }
 

@@ -69,15 +69,17 @@ func AuthMiddleware(au domain.AuthUsecase) MiddlewareFunc {
 
 			cookie, err := c.Cookie(cookieKeyAuthToken)
 			if err != nil {
-				return c.String(http.StatusUnauthorized, "Missing auth token.")
+				// return c.String(http.StatusUnauthorized, "Missing auth token.")
+				return next(c)
 			}
 
-			uid, err := au.ValidateAuthToken(ctx, domain.AuthToken(cookie.Value))
+			am, err := au.ValidateAuthToken(ctx, domain.AuthToken(cookie.Value))
 			if err != nil {
-				return c.String(http.StatusUnauthorized, "Invalid auth token.")
+				// return c.String(http.StatusUnauthorized, "Invalid auth token.")
+				return next(c)
 			}
 
-			ctxWithUID := newCtxWithUserID(ctx, uid)
+			ctxWithUID := newCtxWithAuthMaterial(ctx, am)
 			c.SetRequest(c.Request().WithContext(ctxWithUID))
 			return next(c)
 		}

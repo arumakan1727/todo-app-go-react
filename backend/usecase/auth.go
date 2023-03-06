@@ -52,18 +52,22 @@ func (uc *authUc) IssueAuthToken(ctx Ctx, email, passwd string) (AuthToken, erro
 		return "", err
 	}
 	token := AuthToken(ruuid.String())
-	if err := uc.kvs.SaveAuth(ctx, token, user.ID, uc.authTokenMaxAge); err != nil {
+	kr := AuthMaterial{
+		UID:  user.ID,
+		Role: user.Role,
+	}
+	if err := uc.kvs.SaveAuth(ctx, token, &kr, uc.authTokenMaxAge); err != nil {
 		return "", err
 	}
 	return token, nil
 }
 
-func (uc *authUc) ValidateAuthToken(ctx Ctx, token AuthToken) (UserID, error) {
-	uid, err := uc.kvs.FetchAuth(ctx, token)
+func (uc *authUc) ValidateAuthToken(ctx Ctx, token AuthToken) (AuthMaterial, error) {
+	am, err := uc.kvs.FetchAuth(ctx, token)
 	if err != nil {
-		return 0, ErrUnauthorized
+		return am, ErrUnauthorized
 	}
-	return uid, nil
+	return am, nil
 }
 
 func (uc *authUc) RevokeAuthToken(ctx Ctx, token AuthToken) error {

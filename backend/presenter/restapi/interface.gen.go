@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/arumakan1727/todo-app-go-react/domain"
 	"github.com/deepmap/oapi-codegen/pkg/runtime"
 	"github.com/labstack/echo/v4"
 )
@@ -45,21 +46,21 @@ type ServerInterface interface {
 
 // ServerInterfaceWrapper converts echo contexts to parameters.
 type ServerInterfaceWrapper struct {
-	Handler             ServerInterface
-	GetClientUIDFromCtx func(context.Context) (UserID, error)
+	Handler              ServerInterface
+	GetClientAuthFromCtx func(context.Context) (domain.AuthMaterial, error)
 }
 
 // ListUsersForAdmin converts echo context to params.
 func (w *ServerInterfaceWrapper) ListUsersForAdmin(ctx echo.Context) error {
 	var err error
 
-	var clientUID UserID
-	if clientUID, err = w.GetClientUIDFromCtx(ctx.Request().Context()); err != nil {
-		return err
+	var am domain.AuthMaterial
+	if am, err = w.GetClientAuthFromCtx(ctx.Request().Context()); err != nil {
+		return echo.NewHTTPError(http.StatusUnauthorized, "Missing or invalid apiAuthToken.")
 	}
 
 	// Invoke the callback with all the unmarshalled arguments
-	err = w.Handler.ListUsersForAdmin(ctx, clientUID)
+	err = w.Handler.ListUsersForAdmin(ctx, am.UID)
 	return err
 }
 
@@ -85,9 +86,9 @@ func (w *ServerInterfaceWrapper) GetPing(ctx echo.Context) error {
 func (w *ServerInterfaceWrapper) ListTasks(ctx echo.Context) error {
 	var err error
 
-	var clientUID UserID
-	if clientUID, err = w.GetClientUIDFromCtx(ctx.Request().Context()); err != nil {
-		return err
+	var am domain.AuthMaterial
+	if am, err = w.GetClientAuthFromCtx(ctx.Request().Context()); err != nil {
+		return echo.NewHTTPError(http.StatusUnauthorized, "Missing or invalid apiAuthToken.")
 	}
 
 	// Parameter object where we will unmarshal all parameters from the context
@@ -100,7 +101,7 @@ func (w *ServerInterfaceWrapper) ListTasks(ctx echo.Context) error {
 	}
 
 	// Invoke the callback with all the unmarshalled arguments
-	err = w.Handler.ListTasks(ctx, clientUID, params)
+	err = w.Handler.ListTasks(ctx, am.UID, params)
 	return err
 }
 
@@ -108,13 +109,13 @@ func (w *ServerInterfaceWrapper) ListTasks(ctx echo.Context) error {
 func (w *ServerInterfaceWrapper) CreateTask(ctx echo.Context) error {
 	var err error
 
-	var clientUID UserID
-	if clientUID, err = w.GetClientUIDFromCtx(ctx.Request().Context()); err != nil {
-		return err
+	var am domain.AuthMaterial
+	if am, err = w.GetClientAuthFromCtx(ctx.Request().Context()); err != nil {
+		return echo.NewHTTPError(http.StatusUnauthorized, "Missing or invalid apiAuthToken.")
 	}
 
 	// Invoke the callback with all the unmarshalled arguments
-	err = w.Handler.CreateTask(ctx, clientUID)
+	err = w.Handler.CreateTask(ctx, am.UID)
 	return err
 }
 
@@ -129,13 +130,13 @@ func (w *ServerInterfaceWrapper) DeleteTask(ctx echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter taskID: %s", err))
 	}
 
-	var clientUID UserID
-	if clientUID, err = w.GetClientUIDFromCtx(ctx.Request().Context()); err != nil {
-		return err
+	var am domain.AuthMaterial
+	if am, err = w.GetClientAuthFromCtx(ctx.Request().Context()); err != nil {
+		return echo.NewHTTPError(http.StatusUnauthorized, "Missing or invalid apiAuthToken.")
 	}
 
 	// Invoke the callback with all the unmarshalled arguments
-	err = w.Handler.DeleteTask(ctx, clientUID, taskID)
+	err = w.Handler.DeleteTask(ctx, am.UID, taskID)
 	return err
 }
 
@@ -150,13 +151,13 @@ func (w *ServerInterfaceWrapper) GetTask(ctx echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter taskID: %s", err))
 	}
 
-	var clientUID UserID
-	if clientUID, err = w.GetClientUIDFromCtx(ctx.Request().Context()); err != nil {
-		return err
+	var am domain.AuthMaterial
+	if am, err = w.GetClientAuthFromCtx(ctx.Request().Context()); err != nil {
+		return echo.NewHTTPError(http.StatusUnauthorized, "Missing or invalid apiAuthToken.")
 	}
 
 	// Invoke the callback with all the unmarshalled arguments
-	err = w.Handler.GetTask(ctx, clientUID, taskID)
+	err = w.Handler.GetTask(ctx, am.UID, taskID)
 	return err
 }
 
@@ -171,13 +172,13 @@ func (w *ServerInterfaceWrapper) PatchTask(ctx echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter taskID: %s", err))
 	}
 
-	var clientUID UserID
-	if clientUID, err = w.GetClientUIDFromCtx(ctx.Request().Context()); err != nil {
-		return err
+	var am domain.AuthMaterial
+	if am, err = w.GetClientAuthFromCtx(ctx.Request().Context()); err != nil {
+		return echo.NewHTTPError(http.StatusUnauthorized, "Missing or invalid apiAuthToken.")
 	}
 
 	// Invoke the callback with all the unmarshalled arguments
-	err = w.Handler.PatchTask(ctx, clientUID, taskID)
+	err = w.Handler.PatchTask(ctx, am.UID, taskID)
 	return err
 }
 

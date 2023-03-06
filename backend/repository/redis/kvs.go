@@ -1,7 +1,9 @@
 package redis
 
 import (
+	"bytes"
 	"context"
+	"encoding/gob"
 	"fmt"
 	"time"
 
@@ -26,17 +28,29 @@ func NewKVS(ctx context.Context, cfg *config.Config) (domain.KVS, error) {
 }
 
 func (kvs *kvs) SaveAuth(
-	ctx context.Context, a domain.AuthToken, uid domain.UserID, expiration time.Duration,
+	ctx context.Context, key domain.AuthToken, am *domain.AuthMaterial, expiration time.Duration,
 ) error {
-	return kvs.cli.Set(ctx, string(a), int(uid), expiration).Err()
+	buf := bytes.NewBuffer(nil)
+	if err := gob.NewEncoder(buf).Encode(am); err != nil {
+		return fmt.Errorf("redis.KVS.SaveAuth: failed to serialize KVSAuthRecord: %w", err)
+	}
+	if err := kvs.cli.Set(ctx, string(key), buf.Bytes(), expiration).Err(); err != nil {
+		return fmt.Errorf("redis.KVS.SaveAuth: failed to set auth: %w", err)
+	}
+	return nil
 }
 
-func (kvs *kvs) FetchAuth(ctx context.Context, a domain.AuthToken) (domain.UserID, error) {
-	uid, err := kvs.cli.Get(ctx, string(a)).Uint64()
+func (kvs *kvs) FetchAuth(ctx context.Context, key domain.AuthToken) (domain.AuthMaterial, error) {
+	var res domain.AuthMaterial
+	bs, err := kvs.cli.Get(ctx, string(key)).Bytes()
 	if err != nil {
-		return 0, fmt.Errorf("failed to get userID by key='%s': %w", a, domain.ErrNotFound)
+		return res, fmt.Errorf("redis.KVS.FetchAuth: failed to get auth by key='%s': %w", key, domain.ErrNotFound)
 	}
-	return domain.UserID(uid), nil
+
+	if err := gob.NewDecoder(bytes.NewReader(bs)).Decode(&res); err != nil {
+		return res, fmt.Errorf("redis.KVS.FetchAuth: failed to deserialize: %w", err)
+	}
+	return res, nil
 }
 
 func (kvs *kvs) DeleteAuth(ctx context.Context, a domain.AuthToken) error {
