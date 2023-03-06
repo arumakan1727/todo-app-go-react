@@ -24,6 +24,17 @@ services:
     volumes:
       - todoapp-redis-data:/data
 
+  swagger-ui:
+    image: swaggerapi/swagger-ui
+    container_name: "${X_CONTAINER_NAME_SWAGGER_UI:-todoapp_swagger-ui}"
+    environment:
+      SWAGGER_URL: "api-spec/open-api.yaml"
+      SWAGGER_JSON: /swagger/open-api.yaml
+    ports:
+      - 8080:8080
+    volumes:
+      - ./api-spec/:/swagger
+
 volumes:
   todoapp-db-data:
   todoapp-redis-data:
