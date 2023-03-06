@@ -9,7 +9,7 @@ import (
 )
 
 func makePasswdHashPayload(email, passwd string) []byte {
-	const salt = "iVe$o5uGhe,x1yeetoo^P9ohPhoh3AhbaeHohde9"
+	const salt = "iVe$o5uGhe,x1yeetoo^P9ohPhoh3AhbaeHohde9yae>l2Ag7Ahkee0ahka2geinohh`a6ai()"
 	s := passwd + strings.ToLower(email) + salt
 	b := unsafe.Slice(unsafe.StringData(s), len(s))
 
