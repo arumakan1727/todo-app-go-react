@@ -48,7 +48,7 @@ func NewRepository(
 	db, err := openDB(ctx, cfg)
 	if err != nil {
 		nopCloser := func() {}
-		return nil, nopCloser, fmt.Errorf("NewRepository: failed to open db: %w", err)
+		return nil, nopCloser, fmt.Errorf("pgsql.NewRepository: failed to open db: %w", err)
 	}
 
 	closer := func() { _ = db.Close() }
