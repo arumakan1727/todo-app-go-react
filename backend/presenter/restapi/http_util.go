@@ -3,6 +3,7 @@ package restapi
 import (
 	"context"
 	"encoding/json"
+	"log"
 	"net/http"
 	"strings"
 
@@ -27,6 +28,7 @@ func parseBodyAsJSON(ctx context.Context, r *http.Request, dest interface{}) err
 	d.DisallowUnknownFields()
 
 	if err := d.Decode(dest); err != nil {
+		log.Printf("parseBodyAsJSON(): %#v", err)
 		return Err400UndecodableJSON
 	}
 	return nil
