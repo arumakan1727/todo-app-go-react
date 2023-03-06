@@ -25,7 +25,7 @@ func NewServer(
 	e := echo.New()
 	a := usecase.NewAuthUsecase(repo, kvs, cfg.AuthTokenMaxAge)
 	s := Server{
-		srv: e,
+		srv:    e,
 		authUc: a,
 	}
 
