@@ -15,7 +15,7 @@ import (
 )
 
 type Server struct {
-	srv    *echo.Echo
+	echo   *echo.Echo
 	authUc domain.AuthUsecase
 }
 
@@ -25,7 +25,7 @@ func NewServer(
 	e := echo.New()
 	a := usecase.NewAuthUsecase(repo, kvs, cfg.AuthTokenMaxAge)
 	s := Server{
-		srv:    e,
+		echo:   e,
 		authUc: a,
 	}
 
@@ -42,7 +42,7 @@ func (s *Server) Run(ctx context.Context, address string) error {
 
 	eg, ctx := errgroup.WithContext(ctx)
 	eg.Go(func() error {
-		err := s.srv.Start(address)
+		err := s.echo.Start(address)
 		if err != nil && err != http.ErrServerClosed {
 			log.Printf("failed to close: %#v", err)
 			return err
@@ -51,7 +51,7 @@ func (s *Server) Run(ctx context.Context, address string) error {
 	})
 
 	<-ctx.Done()
-	if err := s.srv.Shutdown(context.Background()); err != nil {
+	if err := s.echo.Shutdown(context.Background()); err != nil {
 		log.Printf("failed to shutdown: %+v", err)
 	}
 
@@ -61,5 +61,5 @@ func (s *Server) Run(ctx context.Context, address string) error {
 
 // Routes は登録済みのルーティング情報の一覧を返す。
 func (s *Server) Routes() []*echo.Route {
-	return s.srv.Routes()
+	return s.echo.Routes()
 }
