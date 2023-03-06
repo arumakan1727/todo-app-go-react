@@ -11,7 +11,8 @@ import (
 )
 
 const (
-	AuthCookieScopes = "AuthCookie.Scopes"
+	AuthCookieScopes      = "AuthCookie.Scopes"
+	BearerAuthTokenScopes = "BearerAuthToken.Scopes"
 )
 
 // Defines values for TaskStatusFilter.

@@ -20,6 +20,7 @@ tags:
   - name: user
 security:
   - AuthCookie: []
+  - BearerAuthToken: []
 paths:
   /ping:
     get:
@@ -179,6 +180,9 @@ components:
       name: todoApiAuthToken
       type: apiKey
       in: cookie
+    BearerAuthToken:
+      type: http
+      scheme: bearer
   schemas:
     UserID:
       type: integer

@@ -64,21 +64,29 @@ func CORSMiddleware(cfg *config.Config) MiddlewareFunc {
 	}
 }
 
-func AuthMiddleware(au domain.AuthUsecase) MiddlewareFunc {
+func AuthMiddleware(runMode config.RunMode, au domain.AuthUsecase) MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
 			c.Logger().Debug("called AuthMiddleware")
 			ctx := c.Request().Context()
 
-			cookie, err := c.Cookie(cookieKeyAuthToken)
-			if err != nil {
-				// return c.String(http.StatusUnauthorized, "Missing auth token.")
-				return next(c)
+			// FIXME Swagger-UIは特別なことをしない限り、
+			// リクエスト時にwithCredentials=includeにできないので
+			// レスポンスのSet-Cookieを認識しない。
+			// そこでAuthorizationヘッダも読み取るようにする。
+			token := c.Request().Header.Get(echo.HeaderAuthorization)
+			token = strings.TrimPrefix(token, "Bearer ")
+
+			if len(token) == 0 {
+				cookie, err := c.Cookie(cookieKeyAuthToken)
+				if err != nil {
+					return next(c)
+				}
+				token = cookie.Value
 			}
 
-			am, err := au.ValidateAuthToken(ctx, domain.AuthToken(cookie.Value))
+			am, err := au.ValidateAuthToken(ctx, domain.AuthToken(token))
 			if err != nil {
-				// return c.String(http.StatusUnauthorized, "Invalid auth token.")
 				return next(c)
 			}
 
