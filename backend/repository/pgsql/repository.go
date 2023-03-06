@@ -67,13 +67,7 @@ func NewRepository(
 func openDB(
 	ctx context.Context, cfg *config.Config,
 ) (*sql.DB, error) {
-	db, err := sql.Open("postgres",
-		fmt.Sprintf(`postgres://%s:%s@%s:%d/%s?sslmode=disable`,
-			cfg.PgSQLUser, cfg.PgSQLPasswd,
-			cfg.PgSQLHost, cfg.PgSQLPort,
-			cfg.PgSQLDatabase,
-		),
-	)
+	db, err := sql.Open("postgres", cfg.PgSQLURL)
 	if err != nil {
 		return nil, err
 	}

@@ -16,11 +16,11 @@ type kvs struct {
 
 func NewKVS(ctx context.Context, cfg *config.Config) (domain.KVS, error) {
 	cli := redis.NewClient(&redis.Options{
-		Addr: fmt.Sprintf("%s:%d", cfg.RedisHost, cfg.RedisPort),
+		Addr: cfg.RedisAddr,
 	})
 
 	if err := cli.Ping(ctx).Err(); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("redis.NewKVS: failed to connect to redis: %w", err)
 	}
 	return &kvs{cli: cli}, nil
 }
