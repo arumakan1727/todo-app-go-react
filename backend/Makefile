@@ -20,8 +20,9 @@ export MAIN_DATABASE_URL := postgres://$(DB_USER)@$(DB_HOST):$(DB_PORT)/$(MAIN_D
 export TEST_DATABASE_URL := postgres://$(DB_USER)@$(DB_HOST):$(DB_PORT)/$(TEST_DB_NAME)?sslmode=disable
 export DBMATE_MIGRATIONS_DIR := _postgres/migrations
 
-export TODO_AUTH_TOKEN_MAX_AGE ?= 6h
 export TODO_RUN_MODE   ?= debug
+export TODO_AUTH_TOKEN_MAX_AGE ?= 6h
+export TODO_ALLOW_LOCALHOST_ORIGIN ?= true
 export TODO_PGSQL_URL  ?= $(MAIN_DATABASE_URL)
 export TODO_REDIS_ADDR ?= 127.0.0.1:26379
 TODO_SERVE_PORT ?= 8181
