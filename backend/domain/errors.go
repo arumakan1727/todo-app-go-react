@@ -2,18 +2,19 @@ package domain
 
 import "errors"
 
+// アルファベット順
 var (
-	ErrNotFound = errors.New("requested item is not found")
-
 	ErrAlreadyExits = errors.New("already exists")
 
 	ErrEmptyPatch = errors.New("no fields specified to patch")
 
+	ErrIncorrectEmailOrPasswd = errors.New("incorrect email or password")
+
 	ErrInvalidInput = errors.New("given param is invalid")
 
-	ErrNotInTransaction = errors.New("not in transaction")
+	ErrNotFound = errors.New("requested item is not found")
 
-	ErrIncorrectEmailOrPasswd = errors.New("incorrect email or password")
+	ErrNotInTransaction = errors.New("not in transaction")
 
 	ErrUnauthorized = errors.New("unauthorized")
 )
