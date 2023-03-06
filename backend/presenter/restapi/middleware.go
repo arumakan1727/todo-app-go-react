@@ -30,3 +30,15 @@ func AuthMiddleware(au domain.AuthUsecase) MiddlewareFunc {
 		}
 	}
 }
+
+func AdminOnlyMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		panic("TODO")
+	}
+}
+
+func ErrorHandlingMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		panic("TODO")
+	}
+}
