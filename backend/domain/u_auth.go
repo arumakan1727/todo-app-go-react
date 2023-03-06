@@ -15,3 +15,7 @@ type AuthUsecase interface {
 	ValidateAuthToken(Ctx, AuthToken) (AuthMaterial, error)
 	RevokeAuthToken(Ctx, AuthToken) error
 }
+
+func (am *AuthMaterial) IsAdmin() bool {
+	return am.Role == "admin"
+}
