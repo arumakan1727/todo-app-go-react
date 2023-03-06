@@ -16,11 +16,14 @@ func CORSMiddleware(cfg *config.Config) MiddlewareFunc {
 		h.Set(echo.HeaderAccessControlAllowOrigin, origin)
 		h.Set(echo.HeaderAccessControlAllowMethods, "GET,HEAD,POST,PUT,PATCH,DELETE")
 		h.Set(echo.HeaderAccessControlAllowHeaders, strings.Join([]string{
+			echo.HeaderAccept,
 			echo.HeaderAcceptEncoding,
-			echo.HeaderContentType,
+			echo.HeaderAuthorization,
 			echo.HeaderContentLength,
+			echo.HeaderContentType,
 			echo.HeaderCookie,
 		}, ","))
+		h.Set(echo.HeaderAccessControlAllowCredentials, "true")
 		h.Set(echo.HeaderAccessControlMaxAge, "86400") // 86400sec = 24h
 	}
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
