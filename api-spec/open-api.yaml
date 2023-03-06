@@ -10,9 +10,9 @@ info:
     url: "https://github.com/arumakan1727"
   license:
     name: MIT
-    url: "https://opensource.org/license/mit/"
+    url: "https://github.com/arumakan1727/todo-app-go-react/blob/main/LICENSE.txt"
 servers:
-  - url: "http://localhost:8080/v1"
+  - url: "http://localhost:8181/v1"
 tags:
   - name: adminOnly
   - name: authtoken
