@@ -39,10 +39,14 @@ func (s *Server) registerRoutes(h *ServerInterfaceWrapper) {
 		f(g)
 	}
 
+	// GET /ping は /v1 ルート外でも利用可能とする
+	s.echo.GET("/ping", h.GetPing)
+
+	e := s.echo.Group("/v1")
+
 	//-----------------------------------------------
 	// No auth group
 	{
-		e := s.echo
 		e.GET("/ping", h.GetPing)
 		e.POST("/authtoken/new", h.CreateAuthToken)
 		e.POST("/users", h.CreateUser)
@@ -50,7 +54,7 @@ func (s *Server) registerRoutes(h *ServerInterfaceWrapper) {
 
 	//-----------------------------------------------
 	// Normal user auth group
-	e := s.echo.Group("", AuthMiddleware(s.authUc))
+	e = s.echo.Group("", AuthMiddleware(s.authUc))
 	with(e, "/tasks", func(e *echo.Group) {
 		e.GET("", h.ListTasks)
 		e.POST("", h.CreateTask)
