@@ -54,7 +54,7 @@ func (s *Server) registerRoutes(h *ServerInterfaceWrapper) {
 
 	//-----------------------------------------------
 	// Normal user auth group
-	e = s.echo.Group("", AuthMiddleware(s.authUc))
+	e = e.Group("", AuthMiddleware(s.authUc))
 	with(e, "/tasks", func(e *echo.Group) {
 		e.GET("", h.ListTasks)
 		e.POST("", h.CreateTask)
