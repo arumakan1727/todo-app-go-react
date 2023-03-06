@@ -11,6 +11,7 @@ import (
 	"github.com/arumakan1727/todo-app-go-react/domain"
 	"github.com/arumakan1727/todo-app-go-react/usecase"
 	"github.com/labstack/echo/v4"
+	elog "github.com/labstack/gommon/log"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -33,6 +34,12 @@ func NewServer(
 	s.registerRoutes(h)
 	s.setupGlobalMiddleware(cfg)
 
+	switch cfg.RunMode {
+	case config.ModeDebug:
+		s.echo.Logger.SetLevel(elog.DEBUG)
+	case config.ModeRelease:
+		s.echo.Logger.SetLevel(elog.INFO)
+	}
 	return s
 }
 
