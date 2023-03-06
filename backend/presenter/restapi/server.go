@@ -2,6 +2,7 @@ package restapi
 
 import (
 	"context"
+	"errors"
 	"log"
 	"net/http"
 	"os/signal"
@@ -16,8 +17,9 @@ import (
 )
 
 type Server struct {
-	echo   *echo.Echo
-	authUc domain.AuthUsecase
+	echo    *echo.Echo
+	authUc  domain.AuthUsecase
+	runMode config.RunMode
 }
 
 func NewServer(
@@ -26,8 +28,9 @@ func NewServer(
 	e := echo.New()
 	a := usecase.NewAuthUsecase(repo, kvs, cfg.AuthTokenMaxAge)
 	s := Server{
-		echo:   e,
-		authUc: a,
+		echo:    e,
+		authUc:  a,
+		runMode: cfg.RunMode,
 	}
 
 	h := newHandler(cfg.RunMode, repo, a)
@@ -36,10 +39,13 @@ func NewServer(
 
 	switch cfg.RunMode {
 	case config.ModeDebug:
+		s.echo.Debug = true
 		s.echo.Logger.SetLevel(elog.DEBUG)
 	case config.ModeRelease:
+		s.echo.Debug = false
 		s.echo.Logger.SetLevel(elog.INFO)
 	}
+	s.echo.HTTPErrorHandler = s.errorHandler
 	return s
 }
 
@@ -76,4 +82,57 @@ func (s *Server) setupGlobalMiddleware(cfg *config.Config) {
 	s.echo.Use(
 		CORSMiddleware(cfg),
 	)
+}
+
+// domain.Err* がHTTPステータスコードの何番に対応するか
+var pairsDomainErrAndHTTPStatus = []struct {
+	e      error
+	status int
+}{
+	{e: domain.ErrAlreadyExits, status: http.StatusConflict},
+	{e: domain.ErrEmptyPatch, status: http.StatusBadRequest},
+	{e: domain.ErrIncorrectEmailOrPasswd, status: http.StatusUnauthorized},
+	{e: domain.ErrInvalidInput, status: http.StatusBadRequest},
+	{e: domain.ErrNotFound, status: http.StatusNotFound},
+	{e: domain.ErrNotInTransaction, status: http.StatusInternalServerError},
+	{e: domain.ErrUnauthorized, status: http.StatusUnauthorized},
+}
+
+func (s *Server) errorHandler(err error, c echo.Context) {
+	if c.Response().Committed {
+		return
+	}
+
+	if he, ok := err.(*echo.HTTPError); ok {
+		if c.Request().Method == http.MethodHead {
+			if err := c.NoContent(he.Code); err != nil {
+				s.echo.Logger.Error(err)
+			}
+			return
+		}
+		if err := c.JSON(he.Code, &he); err != nil {
+			s.echo.Logger.Error(err)
+		}
+		return
+	}
+
+	var resp struct {
+		Status  int    `json:"-"`
+		Message string `json:"message"`
+	}
+	for _, pair := range pairsDomainErrAndHTTPStatus {
+		if errors.Is(err, pair.e) {
+			resp.Status = pair.status
+			resp.Message = err.Error()
+			break
+		}
+	}
+	if resp.Status == 0 {
+		resp.Status = http.StatusInternalServerError
+		resp.Message = http.StatusText(http.StatusInternalServerError)
+		s.echo.Logger.Error(err)
+	}
+	if err := c.JSON(resp.Status, &resp); err != nil {
+		s.echo.Logger.Error(err)
+	}
 }

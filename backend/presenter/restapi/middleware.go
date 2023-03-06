@@ -88,12 +88,11 @@ func AuthMiddleware(au domain.AuthUsecase) MiddlewareFunc {
 
 func AdminOnlyMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		panic("TODO")
-	}
-}
-
-func ErrorHandlingMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
-	return func(c echo.Context) error {
-		panic("TODO")
+		am, err := getAuthMaterialFromCtx(c.Request().Context())
+		if err != nil || !am.IsAdmin() {
+			// 存在自体を知られないようにするために Not Found
+			return echo.NewHTTPError(http.StatusNotFound, "Not Found")
+		}
+		return next(c)
 	}
 }
