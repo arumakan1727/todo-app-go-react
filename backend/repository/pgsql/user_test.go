@@ -8,6 +8,7 @@ import (
 	"github.com/arumakan1727/todo-app-go-react/clock"
 	"github.com/arumakan1727/todo-app-go-react/domain"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestStoreUser(t *testing.T) {
@@ -15,8 +16,7 @@ func TestStoreUser(t *testing.T) {
 	clk := clock.GetFixedClocker()
 	r := newRepositoryForTest(t, ctx, clk)
 
-	repoImpl := r.(*repository)
-	clearTable(t, ctx, repoImpl, "users")
+	require.NoError(t, r.TruncateAll(ctx))
 
 	testcase := []struct {
 		name     string
@@ -86,9 +86,9 @@ func TestStoreUser(t *testing.T) {
 	}
 }
 
-func clearAndInsertUsers(t *testing.T, ctx context.Context, r *repository) []domain.User {
+func clearAndInsertUsers(t *testing.T, ctx context.Context, r domain.Repository) []domain.User {
 	t.Helper()
-	clearTable(t, ctx, r, "users")
+	require.NoError(t, r.TruncateAll(ctx))
 	us := []domain.User{
 		{
 			Role:        "admin",
@@ -123,8 +123,7 @@ func TestReadUsers(t *testing.T) {
 	clk := clock.GetFixedClocker()
 	r := newRepositoryForTest(t, ctx, clk)
 
-	repoImpl := r.(*repository)
-	users := clearAndInsertUsers(t, ctx, repoImpl)
+	users := clearAndInsertUsers(t, ctx, r)
 
 	t.Run("ListUsers-OK (should not contain PasswdHash)", func(t *testing.T) {
 		t.Parallel()

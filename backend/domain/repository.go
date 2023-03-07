@@ -13,6 +13,10 @@ type Repository interface {
 	// RollbackTx はトランザクションをロールバックする。
 	RollbackTx(Ctx) error
 
+	// ClearAll はリポジトリの全エントリを効率よく削除する（PostgreSQLのTRUNCATE文を使うことを想定）。
+	// 単体テスト等で使うことを想定。
+	TruncateAll(Ctx) error
+
 	StoreUser(Ctx, *User) error
 	ListUsers(Ctx) ([]User, error)
 	GetUserByEmail(Ctx, string) (User, error)

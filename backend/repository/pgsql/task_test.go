@@ -16,10 +16,7 @@ func TestTaskRepository(t *testing.T) {
 	clk := clock.GetFixedClocker()
 	r := newRepositoryForTest(t, ctx, clk)
 
-	repoImpl := r.(*repository)
-	clearTable(t, ctx, repoImpl, "tasks")
-
-	users := clearAndInsertUsers(t, ctx, repoImpl)
+	users := clearAndInsertUsers(t, ctx, r)
 
 	ts := make([]domain.Task, 3)
 
