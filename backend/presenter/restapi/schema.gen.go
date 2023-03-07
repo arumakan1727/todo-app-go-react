@@ -49,6 +49,11 @@ type ReqPatchTask struct {
 	Title *TaskTitle `json:"title,omitempty"`
 }
 
+// RespSimpleError defines model for RespSimpleError.
+type RespSimpleError struct {
+	Message string `json:"message"`
+}
+
 // RespTask defines model for RespTask.
 type RespTask struct {
 	CreatedAt time.Time `json:"createdAt"`
@@ -91,6 +96,18 @@ type UserID = domain.UserID
 
 // Resp200Task defines model for Resp200Task.
 type Resp200Task = RespTask
+
+// Resp401MissingOrInvalidToken defines model for Resp401MissingOrInvalidToken.
+type Resp401MissingOrInvalidToken = RespSimpleError
+
+// Resp404NotFoundOrUnauthorizedOrForbidden defines model for Resp404NotFoundOrUnauthorizedOrForbidden.
+type Resp404NotFoundOrUnauthorizedOrForbidden = RespSimpleError
+
+// Resp409DuplicatedValue defines model for Resp409DuplicatedValue.
+type Resp409DuplicatedValue = RespSimpleError
+
+// RespXXXSomeError defines model for RespXXXSomeError.
+type RespXXXSomeError = RespSimpleError
 
 // ListTasksParams defines parameters for ListTasks.
 type ListTasksParams struct {

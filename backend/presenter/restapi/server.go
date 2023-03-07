@@ -123,22 +123,26 @@ func (s *Server) errorHandler(err error, c echo.Context) {
 	}
 
 	var resp struct {
-		Status  int    `json:"-"`
-		Message string `json:"message"`
+		status int
+		body   RespSimpleError
 	}
 	for _, pair := range pairsDomainErrAndHTTPStatus {
 		if errors.Is(err, pair.e) {
-			resp.Status = pair.status
-			resp.Message = err.Error()
+			resp.status = pair.status
+			resp.body = RespSimpleError{
+				Message: err.Error(),
+			}
 			break
 		}
 	}
-	if resp.Status == 0 {
-		resp.Status = http.StatusInternalServerError
-		resp.Message = http.StatusText(http.StatusInternalServerError)
+	if resp.status == 0 {
+		resp.status = http.StatusInternalServerError
+		resp.body = RespSimpleError{
+			Message: http.StatusText(http.StatusInternalServerError),
+		}
 		s.echo.Logger.Error(err)
 	}
-	if err := c.JSON(resp.Status, &resp); err != nil {
+	if err := c.JSON(resp.status, &resp.body); err != nil {
 		s.echo.Logger.Error(err)
 	}
 }

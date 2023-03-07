@@ -58,6 +58,12 @@ paths:
               description: todoAppAuthToken
         '401':
           description: incorrect email or password
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RespSimpleError'
+        default:
+          $ref: '#/components/responses/RespXXXSomeError'
   /tasks:
     get:
       operationId: ListTasks
@@ -80,6 +86,8 @@ paths:
                 $ref: '#/components/schemas/RespTaskList'
         '401':
           $ref: '#/components/responses/Resp401MissingOrInvalidToken'
+        default:
+          $ref: '#/components/responses/RespXXXSomeError'
     post:
       operationId: CreateTask
       description: Create a task.
@@ -95,6 +103,8 @@ paths:
           $ref: '#/components/responses/Resp200Task'
         '401':
           $ref: '#/components/responses/Resp401MissingOrInvalidToken'
+        default:
+          $ref: '#/components/responses/RespXXXSomeError'
   '/tasks/{taskID}':
     parameters:
       - name: taskID
@@ -112,6 +122,8 @@ paths:
           $ref: '#/components/responses/Resp200Task'
         '404':
           $ref: '#/components/responses/Resp404NotFoundOrUnauthorizedOrForbidden'
+        default:
+          $ref: '#/components/responses/RespXXXSomeError'
     patch:
       operationId: PatchTask
       description: Patch a task
@@ -127,6 +139,8 @@ paths:
           $ref: '#/components/responses/Resp200Task'
         '404':
           $ref: '#/components/responses/Resp404NotFoundOrUnauthorizedOrForbidden'
+        default:
+          $ref: '#/components/responses/RespXXXSomeError'
     delete:
       operationId: DeleteTask
       description: Delete a task.
@@ -137,6 +151,8 @@ paths:
           $ref: '#/components/responses/Resp200Task'
         '404':
           $ref: '#/components/responses/Resp404NotFoundOrUnauthorizedOrForbidden'
+        default:
+          $ref: '#/components/responses/RespXXXSomeError'
   /users:
     post:
       operationId: CreateUser
@@ -158,6 +174,8 @@ paths:
                 $ref: '#/components/schemas/ReqCreateUser'
         '409':
           $ref: '#/components/responses/Resp409DuplicatedValue'
+        default:
+          $ref: '#/components/responses/RespXXXSomeError'
   /__/users:
     get:
       operationId: ListUsersForAdmin
@@ -174,6 +192,8 @@ paths:
                 $ref: '#/components/schemas/RespUserList'
         '404':
           $ref: '#/components/responses/Resp404NotFoundOrUnauthorizedOrForbidden'
+        default:
+          $ref: '#/components/responses/RespXXXSomeError'
 components:
   securitySchemes:
     AuthCookie:
@@ -197,6 +217,13 @@ components:
       format: password
       minLength: 8
       maxLength: 60
+    RespSimpleError:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
     ReqCreateAuthToken:
       type: object
       required:
@@ -319,21 +346,27 @@ components:
     Resp401MissingOrInvalidToken:
       description: Missing or invalid access token.
       content:
-        text/plain:
+        application/json:
           schema:
-            type: string
+            $ref: '#/components/schemas/RespSimpleError'
     Resp404NotFoundOrUnauthorizedOrForbidden:
       description: |-
         NotFound || Unauthorized || Forbidden
         リソースの存在自体を把握されないようにするために、
         Forbidden ではなく NotFound のステータスコードを返す。
       content:
-        text/plain:
+        application/json:
           schema:
-            type: string
+            $ref: '#/components/schemas/RespSimpleError'
     Resp409DuplicatedValue:
       description: Duplicated value.
       content:
-        text/plain:
+        application/json:
           schema:
-            type: string
+            $ref: '#/components/schemas/RespSimpleError'
+    RespXXXSomeError:
+      description: Some error.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/RespSimpleError'
