@@ -9,9 +9,7 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-type MiddlewareFunc = func(next echo.HandlerFunc) echo.HandlerFunc
-
-func CORSMiddleware(cfg *config.Config) MiddlewareFunc {
+func CORSMiddleware(cfg *config.Config) echo.MiddlewareFunc {
 	setAccessControlHeader := func(h http.Header, origin string) {
 		h.Set(echo.HeaderAccessControlAllowOrigin, origin)
 		h.Set(echo.HeaderAccessControlAllowMethods, "GET,HEAD,POST,PUT,PATCH,DELETE")
@@ -64,7 +62,7 @@ func CORSMiddleware(cfg *config.Config) MiddlewareFunc {
 	}
 }
 
-func AuthMiddleware(runMode config.RunMode, au domain.AuthUsecase) MiddlewareFunc {
+func AuthMiddleware(runMode config.RunMode, au domain.AuthUsecase) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
 			c.Logger().Debug("called AuthMiddleware")
