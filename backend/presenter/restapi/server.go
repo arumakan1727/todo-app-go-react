@@ -56,10 +56,21 @@ func (s *Server) HideBanner(hide bool) {
 	s.echo.HideBanner = hide
 }
 
+func (s *Server) Close() {
+	if s.repo != nil {
+		s.repo.Close()
+	}
+	if s.kvs != nil {
+		s.kvs.Close()
+	}
+	if s.echo.Listener != nil {
+		_ = s.echo.Listener.Close()
+	}
+}
+
 // Serve は Graceful shutdown を有効にしてサーバを起動する。
 func (s *Server) Serve(ctx context.Context, l net.Listener) error {
-	defer s.repo.Close()
-	defer s.kvs.Close()
+	defer s.Close()
 
 	ctx, stop := signal.NotifyContext(ctx, syscall.SIGINT, syscall.SIGTERM)
 	defer stop()
