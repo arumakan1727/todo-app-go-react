@@ -38,7 +38,7 @@ paths:
                 type: string
   /authtoken/new:
     post:
-      operationId: CreateAuthToken
+      operationId: IssueAuthToken
       description: Generate a new authentication token.
       tags:
         - authtoken

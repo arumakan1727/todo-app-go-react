@@ -58,7 +58,7 @@ func registerRoutes(
 	// No auth group
 	{
 		e.GET("/ping", h.GetPing)
-		e.POST("/authtoken/new", h.CreateAuthToken)
+		e.POST("/authtoken/new", h.IssueAuthToken)
 		e.POST("/users", h.CreateUser)
 	}
 

@@ -20,7 +20,7 @@ type ServerInterface interface {
 	ListUsersForAdmin(c echo.Context, clientUID UserID) error
 
 	// (POST /authtoken/new)
-	CreateAuthToken(c echo.Context) error
+	IssueAuthToken(c echo.Context) error
 
 	// (GET /ping)
 	GetPing(c echo.Context) error
@@ -64,12 +64,12 @@ func (w *ServerInterfaceWrapper) ListUsersForAdmin(ctx echo.Context) error {
 	return err
 }
 
-// CreateAuthToken converts echo context to params.
-func (w *ServerInterfaceWrapper) CreateAuthToken(ctx echo.Context) error {
+// IssueAuthToken converts echo context to params.
+func (w *ServerInterfaceWrapper) IssueAuthToken(ctx echo.Context) error {
 	var err error
 
 	// Invoke the callback with all the unmarshalled arguments
-	err = w.Handler.CreateAuthToken(ctx)
+	err = w.Handler.IssueAuthToken(ctx)
 	return err
 }
 

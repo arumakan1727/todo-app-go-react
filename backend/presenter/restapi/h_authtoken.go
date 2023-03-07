@@ -11,7 +11,7 @@ type AuthTokenHandler struct {
 	usecase domain.AuthUsecase
 }
 
-func (h *AuthTokenHandler) CreateAuthToken(c echo.Context) error {
+func (h *AuthTokenHandler) IssueAuthToken(c echo.Context) error {
 	ctx := c.Request().Context()
 
 	var b ReqCreateAuthToken

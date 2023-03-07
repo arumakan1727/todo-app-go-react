@@ -115,8 +115,8 @@ type ListTasksParams struct {
 	Status *TaskStatusFilter `form:"status,omitempty" json:"status,omitempty"`
 }
 
-// CreateAuthTokenJSONRequestBody defines body for CreateAuthToken for application/json ContentType.
-type CreateAuthTokenJSONRequestBody = ReqCreateAuthToken
+// IssueAuthTokenJSONRequestBody defines body for IssueAuthToken for application/json ContentType.
+type IssueAuthTokenJSONRequestBody = ReqCreateAuthToken
 
 // CreateTaskJSONRequestBody defines body for CreateTask for application/json ContentType.
 type CreateTaskJSONRequestBody = ReqCreateTask

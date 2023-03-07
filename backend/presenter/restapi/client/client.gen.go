@@ -93,10 +93,10 @@ type ClientInterface interface {
 	// ListUsersForAdmin request
 	ListUsersForAdmin(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// CreateAuthToken request with any body
-	CreateAuthTokenWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// IssueAuthToken request with any body
+	IssueAuthTokenWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	CreateAuthToken(ctx context.Context, body CreateAuthTokenJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	IssueAuthToken(ctx context.Context, body IssueAuthTokenJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// GetPing request
 	GetPing(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -138,8 +138,8 @@ func (c *Client) ListUsersForAdmin(ctx context.Context, reqEditors ...RequestEdi
 	return c.Client.Do(req)
 }
 
-func (c *Client) CreateAuthTokenWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewCreateAuthTokenRequestWithBody(c.Server, contentType, body)
+func (c *Client) IssueAuthTokenWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewIssueAuthTokenRequestWithBody(c.Server, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -150,8 +150,8 @@ func (c *Client) CreateAuthTokenWithBody(ctx context.Context, contentType string
 	return c.Client.Do(req)
 }
 
-func (c *Client) CreateAuthToken(ctx context.Context, body CreateAuthTokenJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewCreateAuthTokenRequest(c.Server, body)
+func (c *Client) IssueAuthToken(ctx context.Context, body IssueAuthTokenJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewIssueAuthTokenRequest(c.Server, body)
 	if err != nil {
 		return nil, err
 	}
@@ -309,19 +309,19 @@ func NewListUsersForAdminRequest(server string) (*http.Request, error) {
 	return req, nil
 }
 
-// NewCreateAuthTokenRequest calls the generic CreateAuthToken builder with application/json body
-func NewCreateAuthTokenRequest(server string, body CreateAuthTokenJSONRequestBody) (*http.Request, error) {
+// NewIssueAuthTokenRequest calls the generic IssueAuthToken builder with application/json body
+func NewIssueAuthTokenRequest(server string, body IssueAuthTokenJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewCreateAuthTokenRequestWithBody(server, "application/json", bodyReader)
+	return NewIssueAuthTokenRequestWithBody(server, "application/json", bodyReader)
 }
 
-// NewCreateAuthTokenRequestWithBody generates requests for CreateAuthToken with any type of body
-func NewCreateAuthTokenRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+// NewIssueAuthTokenRequestWithBody generates requests for IssueAuthToken with any type of body
+func NewIssueAuthTokenRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	serverURL, err := url.Parse(server)
