@@ -7,7 +7,6 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/arumakan1727/todo-app-go-react/config"
 	"github.com/arumakan1727/todo-app-go-react/presenter/restapi"
 	"github.com/labstack/echo/v4"
 )
@@ -31,15 +30,8 @@ func getSelfModName() string {
 }
 
 func CmdRoutes() {
-	cfg, err := config.NewFromEnv()
-	if err != nil {
-		log.Fatalf("cannot configure from env: %v", err)
-	}
-
-	s := restapi.NewServer(cfg, nil, nil)
-
 	selfModName := getSelfModName()
-	routes := filterMap(s.Routes(), func(r *echo.Route) *echo.Route {
+	routes := filterMap(restapi.Routes(), func(r *echo.Route) *echo.Route {
 		if name, ok := strings.CutPrefix(r.Name, selfModName); ok {
 			return &echo.Route{
 				Method: r.Method,

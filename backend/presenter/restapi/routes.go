@@ -7,7 +7,7 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func newHandler(
+func NewHandler(
 	runMode config.RunMode, repo domain.Repository, authUc domain.AuthUsecase,
 ) *ServerInterfaceWrapper {
 	userUc := usecase.NewUserUsecase(repo)
@@ -30,19 +30,29 @@ func newHandler(
 	}
 }
 
-func (s *Server) registerRoutes(h *ServerInterfaceWrapper) {
-	type echoGrouper interface {
-		Group(prefix string, m ...echo.MiddlewareFunc) *echo.Group
-	}
-	with := func(e echoGrouper, prefix string, f func(*echo.Group)) {
+type EchoRouter interface {
+	GET(path string, h echo.HandlerFunc, m ...echo.MiddlewareFunc) *echo.Route
+	HEAD(path string, h echo.HandlerFunc, m ...echo.MiddlewareFunc) *echo.Route
+	POST(path string, h echo.HandlerFunc, m ...echo.MiddlewareFunc) *echo.Route
+	PUT(path string, h echo.HandlerFunc, m ...echo.MiddlewareFunc) *echo.Route
+	PATCH(path string, h echo.HandlerFunc, m ...echo.MiddlewareFunc) *echo.Route
+	DELETE(path string, h echo.HandlerFunc, m ...echo.MiddlewareFunc) *echo.Route
+	OPTIONS(path string, h echo.HandlerFunc, m ...echo.MiddlewareFunc) *echo.Route
+	Group(prefix string, m ...echo.MiddlewareFunc) *echo.Group
+}
+
+func registerRoutes(
+	e EchoRouter, h *ServerInterfaceWrapper, authMiddleware echo.MiddlewareFunc,
+) {
+	with := func(e EchoRouter, prefix string, f func(*echo.Group)) {
 		g := e.Group(prefix)
 		f(g)
 	}
 
 	// GET /ping は /v1 ルート外でも利用可能とする
-	s.echo.GET("/ping", h.GetPing)
+	e.GET("/ping", h.GetPing)
 
-	e := s.echo.Group("/v1")
+	e = e.Group("/v1")
 
 	//-----------------------------------------------
 	// No auth group
@@ -54,7 +64,7 @@ func (s *Server) registerRoutes(h *ServerInterfaceWrapper) {
 
 	//-----------------------------------------------
 	// Normal user auth group
-	e = e.Group("", AuthMiddleware(s.runMode, s.authUc))
+	e = e.Group("", authMiddleware)
 	with(e, "/tasks", func(e *echo.Group) {
 		e.GET("", h.ListTasks)
 		e.POST("", h.CreateTask)
@@ -70,4 +80,16 @@ func (s *Server) registerRoutes(h *ServerInterfaceWrapper) {
 	// admin only group
 	e = e.Group("/__", AdminOnlyMiddleware)
 	e.GET("/users", h.ListUsersForAdmin)
+}
+
+func Routes() []*echo.Route {
+	e := echo.New()
+	h := NewHandler(config.ModeDebug, nil, nil)
+	fakeAuthMiddleware := echo.MiddlewareFunc(func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(c echo.Context) error {
+			return next(c)
+		}
+	})
+	registerRoutes(e, h, fakeAuthMiddleware)
+	return e.Routes()
 }

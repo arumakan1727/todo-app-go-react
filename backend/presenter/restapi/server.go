@@ -26,15 +26,15 @@ func NewServer(
 	cfg *config.Config, repo domain.Repository, kvs domain.KVS,
 ) Server {
 	e := echo.New()
-	a := usecase.NewAuthUsecase(repo, kvs, cfg.AuthTokenMaxAge)
+	au := usecase.NewAuthUsecase(repo, kvs, cfg.AuthTokenMaxAge)
 	s := Server{
 		echo:    e,
-		authUc:  a,
+		authUc:  au,
 		runMode: cfg.RunMode,
 	}
 
-	h := newHandler(cfg.RunMode, repo, a)
-	s.registerRoutes(h)
+	h := NewHandler(cfg.RunMode, repo, au)
+	registerRoutes(s.echo, h, AuthMiddleware(cfg.RunMode, au))
 	s.setupGlobalMiddleware(cfg)
 
 	switch cfg.RunMode {
@@ -71,11 +71,6 @@ func (s *Server) Run(ctx context.Context, address string) error {
 
 	// wait for graceful shutdown
 	return eg.Wait()
-}
-
-// Routes は登録済みのルーティング情報の一覧を返す。
-func (s *Server) Routes() []*echo.Route {
-	return s.echo.Routes()
 }
 
 func (s *Server) setupGlobalMiddleware(cfg *config.Config) {
