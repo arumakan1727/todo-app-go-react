@@ -72,10 +72,10 @@ func AuthMiddleware(runMode config.RunMode, au domain.AuthUsecase) echo.Middlewa
 			// リクエスト時にwithCredentials=includeにできないので
 			// レスポンスのSet-Cookieを認識しない。
 			// そこでAuthorizationヘッダも読み取るようにする。
-			token := c.Request().Header.Get(echo.HeaderAuthorization)
-			token = strings.TrimPrefix(token, "Bearer ")
+			a := c.Request().Header.Get(echo.HeaderAuthorization)
+			token, ok := strings.CutPrefix(a, "Bearer ")
 
-			if len(token) == 0 {
+			if !ok || len(token) == 0 {
 				cookie, err := c.Cookie(CookieKeyAuthToken)
 				if err != nil {
 					return next(c)
@@ -90,6 +90,7 @@ func AuthMiddleware(runMode config.RunMode, au domain.AuthUsecase) echo.Middlewa
 
 			ctxWithUID := newCtxWithAuthMaterial(ctx, am)
 			c.SetRequest(c.Request().WithContext(ctxWithUID))
+			storeAuthTokenIntoCtx(c, domain.AuthToken(token))
 			return next(c)
 		}
 	}

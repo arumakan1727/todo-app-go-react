@@ -93,6 +93,9 @@ type ClientInterface interface {
 	// ListUsersForAdmin request
 	ListUsersForAdmin(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
 
+	// DeleteAuthToken request
+	DeleteAuthToken(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
+
 	// IssueAuthToken request with any body
 	IssueAuthTokenWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
@@ -128,6 +131,18 @@ type ClientInterface interface {
 
 func (c *Client) ListUsersForAdmin(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewListUsersForAdminRequest(c.Server)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) DeleteAuthToken(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteAuthTokenRequest(c.Server)
 	if err != nil {
 		return nil, err
 	}
@@ -302,6 +317,33 @@ func NewListUsersForAdminRequest(server string) (*http.Request, error) {
 	}
 
 	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewDeleteAuthTokenRequest generates requests for DeleteAuthToken
+func NewDeleteAuthTokenRequest(server string) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/authtoken")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("DELETE", queryURL.String(), nil)
 	if err != nil {
 		return nil, err
 	}

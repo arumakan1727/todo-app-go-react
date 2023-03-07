@@ -28,5 +28,16 @@ func (h *AuthTokenHandler) IssueAuthToken(c echo.Context) error {
 		h.usecase.GetAuthTokenMaxAge(),
 		h.runMode,
 	))
-	return c.String(200, "OK")
+	return c.NoContent(200)
+}
+
+func (h *AuthTokenHandler) DeleteAuthToken(c echo.Context, uid UserID) error {
+	ctx := c.Request().Context()
+	c.SetCookie(deleteCookie(CookieKeyAuthToken))
+
+	token := getAuthTokenFromCtx(c)
+	if err := h.usecase.RevokeAuthToken(ctx, token); err != nil {
+		return err
+	}
+	return c.NoContent(200)
 }

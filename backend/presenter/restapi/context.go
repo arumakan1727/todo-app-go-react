@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	"github.com/arumakan1727/todo-app-go-react/domain"
+	"github.com/labstack/echo/v4"
 )
 
 type ctxKeyAuthMaterial struct{}
@@ -22,4 +23,14 @@ func getAuthMaterialFromCtx(ctx context.Context) (domain.AuthMaterial, error) {
 		return am, fmt.Errorf("getAuthMaterialFromCtx: %w", ErrCtxGetValue)
 	}
 	return am, nil
+}
+
+const echoCtxKeyAuthToken = "AuthToken"
+
+func storeAuthTokenIntoCtx(ctx echo.Context, t domain.AuthToken) {
+	ctx.Set(echoCtxKeyAuthToken, t)
+}
+
+func getAuthTokenFromCtx(ctx echo.Context) domain.AuthToken {
+	return ctx.Get(echoCtxKeyAuthToken).(domain.AuthToken)
 }

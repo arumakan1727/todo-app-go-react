@@ -64,6 +64,17 @@ paths:
                 $ref: '#/components/schemas/RespSimpleError'
         default:
           $ref: '#/components/responses/RespXXXSomeError'
+  /authtoken:
+    delete:
+      operationId: DeleteAuthToken
+      description: Delete a authentication token given in header.
+      tags:
+        - authtoken
+      responses:
+        '200':
+          description: OK
+        default:
+          $ref: '#/components/responses/RespXXXSomeError'
   /tasks:
     get:
       operationId: ListTasks

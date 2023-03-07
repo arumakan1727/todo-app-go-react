@@ -19,6 +19,9 @@ type ServerInterface interface {
 	// (GET /__/users)
 	ListUsersForAdmin(c echo.Context, clientUID UserID) error
 
+	// (DELETE /authtoken)
+	DeleteAuthToken(c echo.Context, clientUID UserID) error
+
 	// (POST /authtoken/new)
 	IssueAuthToken(c echo.Context) error
 
@@ -61,6 +64,20 @@ func (w *ServerInterfaceWrapper) ListUsersForAdmin(ctx echo.Context) error {
 
 	// Invoke the callback with all the unmarshalled arguments
 	err = w.Handler.ListUsersForAdmin(ctx, am.UID)
+	return err
+}
+
+// DeleteAuthToken converts echo context to params.
+func (w *ServerInterfaceWrapper) DeleteAuthToken(ctx echo.Context) error {
+	var err error
+
+	var am domain.AuthMaterial
+	if am, err = w.GetClientAuthFromCtx(ctx.Request().Context()); err != nil {
+		return echo.NewHTTPError(http.StatusUnauthorized, "Missing or invalid apiAuthToken.")
+	}
+
+	// Invoke the callback with all the unmarshalled arguments
+	err = w.Handler.DeleteAuthToken(ctx, am.UID)
 	return err
 }
 

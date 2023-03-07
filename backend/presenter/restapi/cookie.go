@@ -23,3 +23,15 @@ func newSecureCookie(
 		SameSite: http.SameSiteStrictMode,
 	}
 }
+
+func deleteCookie(name string) *http.Cookie {
+	return &http.Cookie{
+		Name:     name,
+		Value:    "",
+		Path:     "/",
+		Domain:   "",
+		MaxAge:   -1,
+		HttpOnly: true,
+		SameSite: http.SameSiteStrictMode,
+	}
+}
