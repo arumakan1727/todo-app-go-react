@@ -76,7 +76,7 @@ func AuthMiddleware(runMode config.RunMode, au domain.AuthUsecase) echo.Middlewa
 			token = strings.TrimPrefix(token, "Bearer ")
 
 			if len(token) == 0 {
-				cookie, err := c.Cookie(cookieKeyAuthToken)
+				cookie, err := c.Cookie(CookieKeyAuthToken)
 				if err != nil {
 					return next(c)
 				}

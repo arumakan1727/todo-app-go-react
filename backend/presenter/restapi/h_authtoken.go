@@ -24,7 +24,7 @@ func (h *AuthTokenHandler) CreateAuthToken(c echo.Context) error {
 		return err
 	}
 	c.SetCookie(newSecureCookie(
-		cookieKeyAuthToken, string(token),
+		CookieKeyAuthToken, string(token),
 		h.usecase.GetAuthTokenMaxAge(),
 		h.runMode,
 	))
