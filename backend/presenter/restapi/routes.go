@@ -65,6 +65,7 @@ func registerRoutes(
 	//-----------------------------------------------
 	// Normal user auth group
 	e = e.Group("", authMiddleware)
+	e.DELETE("/authtoken", h.DeleteAuthToken)
 	with(e, "/tasks", func(e *echo.Group) {
 		e.GET("", h.ListTasks)
 		e.POST("", h.CreateTask)
