@@ -11,7 +11,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestAuthToken(t *testing.T) {
+func TestAuthTokenAPI(t *testing.T) {
 	t.Parallel()
 
 	var token domain.AuthToken
