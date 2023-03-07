@@ -8,7 +8,7 @@ type UserID uint64
 type AuthToken string
 
 type UserUsecase interface {
-	Store(ctx Ctx, email, passwd, displayName string) (User, error)
+	Store(ctx Ctx, email, passwd, displayName, role string) (User, error)
 	List(Ctx) ([]User, error)
 }
 

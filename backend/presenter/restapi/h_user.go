@@ -38,7 +38,7 @@ func (h *UserHandler) CreateUser(c echo.Context) error {
 		return err
 	}
 
-	u, err := h.usecase.Store(ctx, string(b.Email), b.Password, b.DisplayName)
+	u, err := h.usecase.Store(ctx, string(b.Email), b.Password, b.DisplayName, "user")
 	if err != nil {
 		return err
 	}

@@ -16,13 +16,13 @@ func NewUserUsecase(repo Repository) UserUsecase {
 	}
 }
 
-func (uc *userUc) Store(ctx Ctx, email, passwd, displayName string) (User, error) {
+func (uc *userUc) Store(ctx Ctx, email, passwd, displayName, role string) (User, error) {
 	pwhash, err := HashPassword(email, passwd)
 	if err != nil {
 		return User{}, fmt.Errorf("cannot hash password: %w", err)
 	}
 	user := User{
-		Role:        "user",
+		Role:        role,
 		Email:       email,
 		PasswdHash:  pwhash,
 		DisplayName: displayName,
