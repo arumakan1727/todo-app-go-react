@@ -98,4 +98,14 @@ type ListTasksParams struct {
 	Status *TaskStatusFilter `form:"status,omitempty" json:"status,omitempty"`
 }
 
-// request-bodies.tmpl (empty)
+// CreateAuthTokenJSONRequestBody defines body for CreateAuthToken for application/json ContentType.
+type CreateAuthTokenJSONRequestBody = ReqCreateAuthToken
+
+// CreateTaskJSONRequestBody defines body for CreateTask for application/json ContentType.
+type CreateTaskJSONRequestBody = ReqCreateTask
+
+// PatchTaskJSONRequestBody defines body for PatchTask for application/json ContentType.
+type PatchTaskJSONRequestBody = ReqPatchTask
+
+// CreateUserJSONRequestBody defines body for CreateUser for application/json ContentType.
+type CreateUserJSONRequestBody = ReqCreateUser

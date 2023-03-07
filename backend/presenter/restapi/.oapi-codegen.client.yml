@@ -1,0 +1,13 @@
+# available config options: https://github.com/deepmap/oapi-codegen/blob/master/pkg/codegen/configuration.go
+package: client
+output: client/client.gen.go
+generate:
+  client: true
+compatibility:
+  always-prefix-enum-values: true
+additional-imports:
+  - package: github.com/arumakan1727/todo-app-go-react/presenter/restapi
+    alias: .
+output-options:
+  skip-prune: true
+  user-templates: {}

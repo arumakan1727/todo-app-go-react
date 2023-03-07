@@ -10,4 +10,4 @@ output-options:
   skip-prune: true
   user-templates:
     # see: https://github.com/deepmap/oapi-codegen/tree/master/pkg/codegen/templates
-    request-bodies.tmpl: "// request-bodies.tmpl (empty)"
+    # request-bodies.tmpl: "// request-bodies.tmpl (empty)"
