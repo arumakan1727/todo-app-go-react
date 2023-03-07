@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"log"
+	"net"
 	"net/http"
 	"os/signal"
 	"syscall"
@@ -24,10 +25,10 @@ type Server struct {
 
 func NewServer(
 	cfg *config.Config, repo domain.Repository, kvs domain.KVS,
-) Server {
+) *Server {
 	e := echo.New()
 	au := usecase.NewAuthUsecase(repo, kvs, cfg.AuthTokenMaxAge)
-	s := Server{
+	s := &Server{
 		echo:    e,
 		authUc:  au,
 		runMode: cfg.RunMode,
@@ -49,14 +50,15 @@ func NewServer(
 	return s
 }
 
-// Run は Graceful shutdown を有効にしてサーバを起動する。
-func (s *Server) Run(ctx context.Context, address string) error {
+// Serve は Graceful shutdown を有効にしてサーバを起動する。
+func (s *Server) Serve(ctx context.Context, l net.Listener) error {
 	ctx, stop := signal.NotifyContext(ctx, syscall.SIGINT, syscall.SIGTERM)
 	defer stop()
 
 	eg, ctx := errgroup.WithContext(ctx)
 	eg.Go(func() error {
-		err := s.echo.Start(address)
+		s.echo.Listener = l
+		err := s.echo.Start("")
 		if err != nil && err != http.ErrServerClosed {
 			log.Printf("failed to close: %#v", err)
 			return err

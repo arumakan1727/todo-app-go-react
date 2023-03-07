@@ -32,7 +32,7 @@ func main() {
 
 	switch flag.Arg(0) {
 	case "serve":
-		CmdServe(fmt.Sprintf("%s:%d", flagHost, flagPort))
+		CmdServe(flagHost, flagPort)
 	case "routes":
 		CmdRoutes()
 	default:

@@ -2,7 +2,9 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
+	"net"
 	"time"
 
 	"github.com/arumakan1727/todo-app-go-react/clock"
@@ -12,15 +14,19 @@ import (
 	"github.com/arumakan1727/todo-app-go-react/repository/redis"
 )
 
-func CmdServe(address string) {
-	serve := func(ctx context.Context, address string) error {
+func CmdServe(host string, port uint) {
+	launch := func(ctx context.Context) error {
 		cfg, err := config.NewFromEnv()
 		if err != nil {
-			log.Fatalf("cannot configure from env: %v", err)
+			return fmt.Errorf("cannot configure from env: %v", err)
+		}
+
+		listener, err := net.Listen("tcp", fmt.Sprintf("%s:%d", host, port))
+		if err != nil {
+			return fmt.Errorf("failed to listen at TCP port %d on %s: %v", port, host, err)
 		}
 
 		clk := clock.GetRealClocker(time.UTC)
-
 		repo, closeRepo, err := pgsql.NewRepository(ctx, cfg, clk)
 		if err != nil {
 			return err
@@ -33,10 +39,10 @@ func CmdServe(address string) {
 		}
 
 		s := restapi.NewServer(cfg, repo, kvs)
-		return s.Run(ctx, address)
+		return s.Serve(ctx, listener)
 	}
 
-	if err := serve(context.Background(), address); err != nil {
+	if err := launch(context.Background()); err != nil {
 		log.Fatal(err)
 	}
 }
