@@ -10,4 +10,6 @@ additional-imports:
     alias: .
 output-options:
   skip-prune: true
-  user-templates: {}
+  user-templates:
+    # see: https://github.com/deepmap/oapi-codegen/tree/master/pkg/codegen/templates
+    client-with-responses.tmpl: "// client-with-responses.tmpl (empty)"
