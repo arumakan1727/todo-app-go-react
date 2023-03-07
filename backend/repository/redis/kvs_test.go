@@ -20,6 +20,7 @@ func newKVSForTest(t *testing.T) domain.KVS {
 	if err != nil {
 		t.Fatalf("newKVSForTest: cannot open Redis: %#v", err)
 	}
+	t.Cleanup(k.Close)
 	return k
 }
 

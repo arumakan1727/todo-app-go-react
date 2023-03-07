@@ -1,6 +1,8 @@
 package domain
 
 type Repository interface {
+	Close()
+
 	// BeginTx はトランザクションを開始する。
 	// すでにトランザクション中の場合は何もしない (非エラー)。
 	BeginTx(Ctx) error

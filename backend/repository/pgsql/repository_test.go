@@ -12,11 +12,11 @@ import (
 
 func newRepositoryForTest(t *testing.T, ctx context.Context, clk clock.Clocker) domain.Repository {
 	t.Helper()
-	r, cleanup, err := NewRepository(ctx, config.ForTesting(), clk)
+	r, err := NewRepository(ctx, config.ForTesting(), clk)
 	if err != nil {
 		t.Fatal(err)
 	}
-	t.Cleanup(cleanup)
+	t.Cleanup(r.Close)
 	return r
 }
 

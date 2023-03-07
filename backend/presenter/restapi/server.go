@@ -19,8 +19,9 @@ import (
 
 type Server struct {
 	echo    *echo.Echo
-	authUc  domain.AuthUsecase
 	runMode config.RunMode
+	repo    domain.Repository
+	kvs     domain.KVS
 }
 
 func NewServer(
@@ -30,8 +31,9 @@ func NewServer(
 	au := usecase.NewAuthUsecase(repo, kvs, cfg.AuthTokenMaxAge)
 	s := &Server{
 		echo:    e,
-		authUc:  au,
 		runMode: cfg.RunMode,
+		repo:    repo,
+		kvs:     kvs,
 	}
 
 	h := NewHandler(cfg.RunMode, repo, au)
@@ -50,8 +52,15 @@ func NewServer(
 	return s
 }
 
+func (s *Server) HideBanner(hide bool) {
+	s.echo.HideBanner = hide
+}
+
 // Serve は Graceful shutdown を有効にしてサーバを起動する。
 func (s *Server) Serve(ctx context.Context, l net.Listener) error {
+	defer s.repo.Close()
+	defer s.kvs.Close()
+
 	ctx, stop := signal.NotifyContext(ctx, syscall.SIGINT, syscall.SIGTERM)
 	defer stop()
 

@@ -27,6 +27,13 @@ func NewKVS(ctx context.Context, cfg *config.Config) (domain.KVS, error) {
 	return &kvs{cli: cli}, nil
 }
 
+func (kvs *kvs) Close() {
+	if kvs == nil || kvs.cli == nil {
+		return
+	}
+	_ = kvs.cli.Close()
+}
+
 func (kvs *kvs) SaveAuth(
 	ctx context.Context, key domain.AuthToken, am *domain.AuthMaterial, expiration time.Duration,
 ) error {

@@ -40,18 +40,13 @@ type repository struct {
 	clk clock.Clocker
 }
 
-type CloseFunc func()
-
 func NewRepository(
 	ctx context.Context, cfg *config.Config, clk clock.Clocker,
-) (domain.Repository, CloseFunc, error) {
+) (domain.Repository, error) {
 	db, err := openDB(ctx, cfg)
 	if err != nil {
-		nopCloser := func() {}
-		return nil, nopCloser, fmt.Errorf("pgsql.NewRepository: failed to open db: %w", err)
+		return nil, fmt.Errorf("pgsql.NewRepository: failed to open db: %w", err)
 	}
-
-	closer := func() { _ = db.Close() }
 
 	dbx := sqlx.NewDb(db, "postgres")
 	return &repository{
@@ -61,7 +56,14 @@ func NewRepository(
 		db:  dbx,
 		q:   sqlcgen.New(),
 		clk: clk.In(time.UTC),
-	}, closer, nil
+	}, nil
+}
+
+func (r *repository) Close() {
+	if r == nil || r.db_internal == nil {
+		return
+	}
+	_ = r.db_internal.Close()
 }
 
 func openDB(

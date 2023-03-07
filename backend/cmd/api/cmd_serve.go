@@ -27,16 +27,17 @@ func CmdServe(host string, port uint) {
 		}
 
 		clk := clock.GetRealClocker(time.UTC)
-		repo, closeRepo, err := pgsql.NewRepository(ctx, cfg, clk)
+		repo, err := pgsql.NewRepository(ctx, cfg, clk)
 		if err != nil {
 			return err
 		}
-		defer closeRepo()
+		defer repo.Close()
 
 		kvs, err := redis.NewKVS(ctx, cfg)
 		if err != nil {
 			return err
 		}
+		defer kvs.Close()
 
 		s := restapi.NewServer(cfg, repo, kvs)
 		return s.Serve(ctx, listener)
