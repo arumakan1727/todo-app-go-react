@@ -35,6 +35,8 @@ func main() {
 		CmdServe(flagHost, flagPort)
 	case "routes":
 		CmdRoutes()
+	case "dump-config":
+		CmdDumpConfig()
 	default:
 		printUsage()
 		os.Exit(1)
