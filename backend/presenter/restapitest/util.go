@@ -55,3 +55,15 @@ func addAuthTokenCookie(token domain.AuthToken) client.RequestEditorFn {
 func closeBody(r *http.Response) {
 	_ = r.Body.Close()
 }
+
+func alloc[T any](val T) *T {
+	res := new(T)
+	*res = val
+	return res
+}
+
+func removeAt[T any](i int, a *[]T) T {
+	x := (*a)[i]
+	*a = append((*a)[:i], (*a)[i+1:]...)
+	return x
+}
