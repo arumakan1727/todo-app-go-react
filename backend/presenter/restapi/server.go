@@ -80,7 +80,7 @@ func (s *Server) Serve(ctx context.Context, l net.Listener) error {
 		s.echo.Listener = l
 		err := s.echo.Start("")
 		if err != nil && err != http.ErrServerClosed {
-			log.Printf("failed to close: %#v", err)
+			log.Printf("(*restapi.Server).Serve: failed to close: %#v", err)
 			return err
 		}
 		return nil

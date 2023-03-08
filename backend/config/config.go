@@ -46,7 +46,7 @@ func NewFromEnv() (*Config, error) {
 
 func ForTesting() *Config {
 	return &Config{
-		RunMode:         ModeDebug,
+		RunMode:         ModeRelease,
 		AuthTokenMaxAge: time.Minute * 1,
 
 		AllowedOrigins:       []string{},
