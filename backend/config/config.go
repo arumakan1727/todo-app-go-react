@@ -27,7 +27,7 @@ type Config struct {
 	RedisAddr string `env:"TODO_REDIS_ADDR" envDefault:"127.0.0.1:6379"`
 }
 
-func NewFromEnv() (*Config, error) {
+func LoadFromEnv() (*Config, error) {
 	cfg := &Config{}
 	opt := env.Options{
 		RequiredIfNoDef: true,

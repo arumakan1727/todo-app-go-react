@@ -117,6 +117,10 @@ api/serve:	## Launch api server
 api/routes:	## Print api routes
 	go run ./cmd/api/ routes
 
+.PHONY:	api/dump-config
+api/dump-config:	## Dump api config loaded from env
+	go run ./cmd/api/ dump-config
+
 .PHONY:	help
 help:	## Show Makefile tasks
 	@grep -E '^[a-zA-Z_/-]+:.*##' Makefile | \
