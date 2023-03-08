@@ -16,7 +16,7 @@ import (
 
 func CmdServe(host string, port uint) {
 	launch := func(ctx context.Context) error {
-		cfg, err := config.NewFromEnv()
+		cfg, err := config.LoadFromEnv()
 		if err != nil {
 			return fmt.Errorf("cannot configure from env: %v", err)
 		}
