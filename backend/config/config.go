@@ -2,6 +2,7 @@ package config
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/caarlos0/env/v7"
 )
@@ -14,17 +15,16 @@ const (
 )
 
 type Config struct {
-	RunMode   RunMode `env:"TODO_RUN_MODE"`
-	ServePort int     `env:"TODO_SERVE_PORT"`
+	RunMode         RunMode       `env:"TODO_RUN_MODE"`
+	AuthTokenMaxAge time.Duration `env:"TODO_AUTH_TOKEN_MAX_AGE" envDefault:"24h"`
 
-	PgSQLHost     string `env:"TODO_PGSQL_HOST"`
-	PgSQLPort     int    `env:"TODO_PGSQL_PORT" envDefault:"5432"`
-	PgSQLUser     string `env:"TODO_PGSQL_USER" envDefault:"todouser"`
-	PgSQLPasswd   string `env:"TODO_PGSQL_PASSWORD" envDefault:"todopass"`
-	PgSQLDatabase string `env:"TODO_PGSQL_DATABASE" envDefault:"tododb"`
+	// CORSで許可するオリジンのリスト。正規表現やワイルドカードには対応していない。
+	// http://localhost*, http://127.0.0.0.1* は AllowLocalhostOrigin で制御するので AllowedOrigins での設定は不要。
+	AllowedOrigins       []string `env:"TODO_ALLOWED_ORIGINS" envDefault:""`
+	AllowLocalhostOrigin bool     `env:"TODO_ALLOW_LOCALHOST_ORIGIN" envDefault:"false"`
 
-	RedisHost string `env:"TODO_REDIS_HOST"`
-	RedisPort int    `env:"TODO_REDIS_PORT" envDefault:"6379"`
+	PgSQLURL  string `env:"TODO_PGSQL_URL" envDefault:"postgres://todouser:todopass@127.0.0.1:5432/tododb?sslmode=disable"`
+	RedisAddr string `env:"TODO_REDIS_ADDR" envDefault:"127.0.0.1:6379"`
 }
 
 func NewFromEnv() (*Config, error) {
@@ -46,14 +46,13 @@ func NewFromEnv() (*Config, error) {
 
 func ForTesting() *Config {
 	return &Config{
-		RunMode:       ModeDebug,
-		ServePort:     8181,
-		PgSQLHost:     "127.0.0.1",
-		PgSQLPort:     25432,
-		PgSQLUser:     "todouser",
-		PgSQLPasswd:   "todopass",
-		PgSQLDatabase: "tododb__test",
-		RedisHost:     "127.0.0.1",
-		RedisPort:     26379,
+		RunMode:         ModeRelease,
+		AuthTokenMaxAge: time.Minute * 1,
+
+		AllowedOrigins:       []string{},
+		AllowLocalhostOrigin: true,
+
+		PgSQLURL:  "postgres://todouser:todopass@127.0.0.1:25432/tododb__test?sslmode=disable",
+		RedisAddr: "127.0.0.1:26379",
 	}
 }

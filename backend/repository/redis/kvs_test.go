@@ -20,6 +20,7 @@ func newKVSForTest(t *testing.T) domain.KVS {
 	if err != nil {
 		t.Fatalf("newKVSForTest: cannot open Redis: %#v", err)
 	}
+	t.Cleanup(k.Close)
 	return k
 }
 
@@ -55,40 +56,52 @@ func TestKVS(t *testing.T) {
 
 	in := []struct {
 		key domain.AuthToken
-		uid domain.UserID
+		am  domain.AuthMaterial
 		exp time.Duration
 	}{
 		{
 			key: tokenA,
-			uid: 1,
+			am: domain.AuthMaterial{
+				UID:  1,
+				Role: "role-1",
+			},
 			exp: expirationNormal,
 		},
 		{
 			key: tokenB,
-			uid: 2,
+			am: domain.AuthMaterial{
+				UID:  2,
+				Role: "role-2",
+			},
 			exp: expirationNormal,
 		},
 		{
 			key: tokenA,
-			uid: 3,
+			am: domain.AuthMaterial{
+				UID:  3,
+				Role: "role-3",
+			},
 			exp: expirationNormal,
 		},
 		{
 			key: tokenEphemeral,
-			uid: 4,
+			am: domain.AuthMaterial{
+				UID:  4,
+				Role: "role-4",
+			},
 			exp: expirationShort,
 		},
 	}
 
 	ctx := context.Background()
-	dict := make(map[domain.AuthToken]domain.UserID)
+	dict := make(map[domain.AuthToken]domain.AuthMaterial)
 
 	t.Run("SaveAuth-OK", func(t *testing.T) {
 		for i := range in {
 			in := &in[i]
-			err := k.SaveAuth(ctx, in.key, in.uid, in.exp)
+			err := k.SaveAuth(ctx, in.key, &in.am, in.exp)
 			require.NoError(t, err, "err on testcase %d", i)
-			dict[in.key] = in.uid
+			dict[in.key] = in.am
 		}
 	})
 	t.Run("FetchAuth-OK", func(t *testing.T) {
@@ -109,7 +122,7 @@ func TestKVS(t *testing.T) {
 		key := tokenA
 		got, err := k.FetchAuth(ctx, key)
 		assert.ErrorIs(t, err, domain.ErrNotFound)
-		assert.Equal(t, domain.UserID(0), got)
+		assert.Equal(t, domain.AuthMaterial{}, got)
 	})
 	t.Run("FetchAuth-undeleted-auth-should-be-found", func(t *testing.T) {
 		for key, wantUID := range dict {
@@ -119,11 +132,11 @@ func TestKVS(t *testing.T) {
 			}
 		}
 	})
-	time.Sleep(expirationShort)
 	t.Run("FetchAuth-expired-auth-should-be-NotFound", func(t *testing.T) {
 		key := tokenEphemeral
+		time.Sleep(expirationShort)
 		got, err := k.FetchAuth(ctx, key)
 		assert.ErrorIs(t, err, domain.ErrNotFound)
-		assert.Equal(t, domain.UserID(0), got)
+		assert.Equal(t, domain.AuthMaterial{}, got)
 	})
 }

@@ -1,18 +1,17 @@
-# yaml-language-server: $schema=./.oas-v3.0-schema.json
 openapi: 3.0.0
 info:
   title: ToDo App API
-  version: "1.0"
+  version: '1.0'
   description: |
     ToDOアプリのAPI仕様定義です。
   contact:
     name: arumakan1727
-    url: "https://github.com/arumakan1727"
+    url: 'https://github.com/arumakan1727'
   license:
     name: MIT
-    url: "https://github.com/arumakan1727/todo-app-go-react/blob/main/LICENSE.txt"
+    url: 'https://github.com/arumakan1727/todo-app-go-react/blob/main/LICENSE.txt'
 servers:
-  - url: "http://localhost:8181/v1"
+  - url: 'http://localhost:8181/v1'
 tags:
   - name: adminOnly
   - name: authtoken
@@ -20,261 +19,365 @@ tags:
   - name: task
   - name: user
 security:
-  - accessToken: []
+  - AuthCookie: []
+  - BearerAuthToken: []
 paths:
   /ping:
     get:
       operationId: GetPing
       description: 疎通確認用
-      tags: [healthcheck]
+      tags:
+        - healthcheck
       security: []
       responses:
-        "200":
+        '200':
           description: Responses "pong".
           content:
             text/plain:
-              schema: { type: string }
+              schema:
+                type: string
   /authtoken/new:
     post:
-      operationId: CreateAuthToken
+      operationId: IssueAuthToken
       description: Generate a new authentication token.
-      tags: [authtoken]
+      tags:
+        - authtoken
       security: []
       requestBody:
         content:
           application/json:
-            schema: { $ref: "#/components/schemas/ReqCreateAuthToken" }
+            schema:
+              $ref: '#/components/schemas/ReqCreateAuthToken'
       responses:
-        "200":
+        '200':
           description: OK
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
+              description: todoAppAuthToken
+        '401':
+          description: incorrect email or password
           content:
             application/json:
-              schema: { $ref: "#/components/schemas/RespAuthToken" }
-        "401":
-          description: incorrect email or password
+              schema:
+                $ref: '#/components/schemas/RespSimpleError'
+        default:
+          $ref: '#/components/responses/RespXXXSomeError'
+  /authtoken:
+    delete:
+      operationId: DeleteAuthToken
+      description: Delete a authentication token given in header.
+      tags:
+        - authtoken
+      responses:
+        '200':
+          description: OK
+        default:
+          $ref: '#/components/responses/RespXXXSomeError'
   /tasks:
     get:
       operationId: ListTasks
       description: Get tasks owned by request user.
-      tags: [task]
+      tags:
+        - task
       parameters:
         - name: status
           in: query
           description: タスクの完了状態のフィルタリング指定
           required: false
           schema:
-            $ref: "#/components/schemas/TaskStatusFilter"
+            $ref: '#/components/schemas/TaskStatusFilter'
       responses:
-        "200":
+        '200':
           description: OK
           content:
             application/json:
-              schema: { $ref: "#/components/schemas/RespTaskList" }
-        "401":
-          $ref: "#/components/responses/Resp401MissingOrInvalidToken"
+              schema:
+                $ref: '#/components/schemas/RespTaskList'
+        '401':
+          $ref: '#/components/responses/Resp401MissingOrInvalidToken'
+        default:
+          $ref: '#/components/responses/RespXXXSomeError'
     post:
       operationId: CreateTask
       description: Create a task.
-      tags: [task]
+      tags:
+        - task
       requestBody:
         content:
           application/json:
-            schema: { $ref: "#/components/schemas/ReqCreateTask" }
+            schema:
+              $ref: '#/components/schemas/ReqCreateTask'
       responses:
-        "200":
-          $ref: "#/components/responses/Resp200Task"
-        "401":
-          $ref: "#/components/responses/Resp401MissingOrInvalidToken"
-  "/tasks/{taskID}":
+        '200':
+          $ref: '#/components/responses/Resp200Task'
+        '401':
+          $ref: '#/components/responses/Resp401MissingOrInvalidToken'
+        default:
+          $ref: '#/components/responses/RespXXXSomeError'
+  '/tasks/{taskID}':
     parameters:
       - name: taskID
         in: path
         required: true
-        schema: { $ref: "#/components/schemas/TaskID" }
+        schema:
+          $ref: '#/components/schemas/TaskID'
     get:
       operationId: GetTask
       description: Get a task.
-      tags: [task]
+      tags:
+        - task
       responses:
-        "200":
-          $ref: "#/components/responses/Resp200Task"
-        "404":
-          $ref: "#/components/responses/Resp404NotFoundOrUnauthorizedOrForbidden"
+        '200':
+          $ref: '#/components/responses/Resp200Task'
+        '404':
+          $ref: '#/components/responses/Resp404NotFoundOrUnauthorizedOrForbidden'
+        default:
+          $ref: '#/components/responses/RespXXXSomeError'
     patch:
       operationId: PatchTask
       description: Patch a task
-      tags: [task]
+      tags:
+        - task
       requestBody:
         content:
           application/json:
-            schema: { $ref: "#/components/schemas/ReqPatchTask" }
+            schema:
+              $ref: '#/components/schemas/ReqPatchTask'
       responses:
-        "200":
-          $ref: "#/components/responses/Resp200Task"
-        "404":
-          $ref: "#/components/responses/Resp404NotFoundOrUnauthorizedOrForbidden"
+        '200':
+          $ref: '#/components/responses/Resp200Task'
+        '404':
+          $ref: '#/components/responses/Resp404NotFoundOrUnauthorizedOrForbidden'
+        default:
+          $ref: '#/components/responses/RespXXXSomeError'
     delete:
       operationId: DeleteTask
       description: Delete a task.
-      tags: [task]
+      tags:
+        - task
       responses:
-        "200":
-          $ref: "#/components/responses/Resp200Task"
-        "404":
-          $ref: "#/components/responses/Resp404NotFoundOrUnauthorizedOrForbidden"
+        '200':
+          $ref: '#/components/responses/Resp200Task'
+        '404':
+          $ref: '#/components/responses/Resp404NotFoundOrUnauthorizedOrForbidden'
+        default:
+          $ref: '#/components/responses/RespXXXSomeError'
   /users:
     post:
       operationId: CreateUser
       description: アカウントを登録する
-      tags: [user]
+      tags:
+        - user
       security: []
       requestBody:
         content:
           application/json:
-            schema: { $ref: "#/components/schemas/ReqCreateUser" }
+            schema:
+              $ref: '#/components/schemas/ReqCreateUser'
       responses:
-        "200":
+        '200':
           description: Created
           content:
             application/json:
-              schema: { $ref: "#/components/schemas/ReqCreateUser" }
-        "409":
-          $ref: "#/components/responses/Resp409DuplicatedValue"
+              schema:
+                $ref: '#/components/schemas/ReqCreateUser'
+        '409':
+          $ref: '#/components/responses/Resp409DuplicatedValue'
+        default:
+          $ref: '#/components/responses/RespXXXSomeError'
   /__/users:
     get:
       operationId: ListUsersForAdmin
       description: Get users.
-      tags: [adminOnly, user]
+      tags:
+        - adminOnly
+        - user
       responses:
-        "200":
+        '200':
           description: OK
           content:
             application/json:
-              schema: { $ref: "#/components/schemas/RespUserList" }
-        "404":
-          $ref: "#/components/responses/Resp404NotFoundOrUnauthorizedOrForbidden"
+              schema:
+                $ref: '#/components/schemas/RespUserList'
+        '404':
+          $ref: '#/components/responses/Resp404NotFoundOrUnauthorizedOrForbidden'
+        default:
+          $ref: '#/components/responses/RespXXXSomeError'
 components:
   securitySchemes:
-    accessToken:
+    AuthCookie:
+      name: todoApiAuthToken
+      type: apiKey
+      in: cookie
+    BearerAuthToken:
       type: http
       scheme: bearer
   schemas:
-    # ----- IDs -----
     UserID:
       type: integer
       x-go-type: domain.UserID
       x-go-type-import:
-        path: "github.com/arumakan1727/todo-app-go-react/domain"
+        path: github.com/arumakan1727/todo-app-go-react/domain
     TaskID:
       type: integer
       x-go-type: domain.TaskID
-
-    # ----- auth -----
     Password:
       type: string
       format: password
       minLength: 8
       maxLength: 60
-
+    RespSimpleError:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
     ReqCreateAuthToken:
       type: object
-      required: [email, password]
+      required:
+        - email
+        - password
       properties:
-        email: { type: string, format: email }
-        password: { $ref: "#/components/schemas/Password" }
-
-    RespAuthToken:
-      type: object
-      required: [accessToken, hoge]
-      properties:
-        accessToken: { type: string }
-
-    # ----- task -----
+        email:
+          type: string
+          format: email
+        password:
+          $ref: '#/components/schemas/Password'
     TaskTitle:
       type: string
       minLength: 1
       maxLength: 40
-
     RespTask:
       type: object
-      required: [id, title, done, createdAt]
+      required:
+        - id
+        - title
+        - done
+        - createdAt
       properties:
-        id: { $ref: "#/components/schemas/TaskID" }
-        title: { type: string }
-        done: { type: boolean }
-        createdAt: { type: string, format: date-time }
-
+        id:
+          $ref: '#/components/schemas/TaskID'
+        title:
+          type: string
+        done:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
     RespTaskList:
       type: object
-      required: [totalCount, items]
+      required:
+        - totalCount
+        - items
       properties:
-        totalCount: { type: integer }
-        items: { type: array, items: { $ref: "#/components/schemas/RespTask" } }
-
+        totalCount:
+          type: integer
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/RespTask'
     TaskStatusFilter:
       description: タスクの完了状態のフィルタリング指定
       type: string
-      enum: [todo, done, any]
-
+      enum:
+        - todo
+        - done
+        - any
     ReqCreateTask:
       type: object
-      required: [title]
+      required:
+        - title
       properties:
-        title: { $ref: "#/components/schemas/TaskTitle" }
-
+        title:
+          $ref: '#/components/schemas/TaskTitle'
     ReqPatchTask:
       type: object
       properties:
-        title: { $ref: "#/components/schemas/TaskTitle" }
-        done: { type: boolean }
-
-    # ----- user -----
+        title:
+          $ref: '#/components/schemas/TaskTitle'
+        done:
+          type: boolean
     RespUser:
       type: object
-      required: [id, email, displayName, createdAt]
+      required:
+        - id
+        - email
+        - displayName
+        - createdAt
       properties:
-        id: { $ref: "#/components/schemas/UserID" }
-        email: { type: string, format: email }
-        displayName: { type: string }
-        createdAt: { type: string, format: date-time }
-
+        id:
+          $ref: '#/components/schemas/UserID'
+        email:
+          type: string
+          format: email
+        displayName:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
     RespUserList:
       type: object
-      required: [totalCount, items]
+      required:
+        - totalCount
+        - items
       properties:
-        totalCount: { type: integer }
-        items: { type: array, items: { $ref: "#/components/schemas/RespUser" } }
-
+        totalCount:
+          type: integer
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/RespUser'
     ReqCreateUser:
       type: object
-      required: [email, password, displayName]
+      required:
+        - email
+        - password
+        - displayName
       properties:
-        email: { type: string, format: email, maxLength: 320 }
-        password: { $ref: "#/components/schemas/Password" }
-        displayName: { type: string, minLength: 1, maxLength: 20 }
-
-  #----------------------------------
+        email:
+          type: string
+          format: email
+          maxLength: 320
+        password:
+          $ref: '#/components/schemas/Password'
+        displayName:
+          type: string
+          minLength: 1
+          maxLength: 20
   responses:
     Resp200Task:
       description: OK (returning a task)
       content:
         application/json:
-          schema: { $ref: "#/components/schemas/RespTask" }
+          schema:
+            $ref: '#/components/schemas/RespTask'
     Resp401MissingOrInvalidToken:
       description: Missing or invalid access token.
       content:
-        text/plain:
-          schema: { type: string }
+        application/json:
+          schema:
+            $ref: '#/components/schemas/RespSimpleError'
     Resp404NotFoundOrUnauthorizedOrForbidden:
       description: |-
         NotFound || Unauthorized || Forbidden
         リソースの存在自体を把握されないようにするために、
         Forbidden ではなく NotFound のステータスコードを返す。
       content:
-        text/plain:
-          schema: { type: string }
+        application/json:
+          schema:
+            $ref: '#/components/schemas/RespSimpleError'
     Resp409DuplicatedValue:
       description: Duplicated value.
       content:
-        text/plain:
-          schema: { type: string }
+        application/json:
+          schema:
+            $ref: '#/components/schemas/RespSimpleError'
+    RespXXXSomeError:
+      description: Some error.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/RespSimpleError'

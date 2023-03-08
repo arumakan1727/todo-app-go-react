@@ -24,8 +24,8 @@ output-options:
     echo/echo-wrappers.tmpl: |
       // ServerInterfaceWrapper converts echo contexts to parameters.
       type ServerInterfaceWrapper struct {
-          Handler             ServerInterface
-          GetClientUIDFromCtx func (context.Context) (UserID, error)
+          Handler              ServerInterface
+          GetClientAuthFromCtx func (context.Context) (domain.AuthMaterial, error)
       }
 
       {{range .}}{{$opid := .OperationId}}// {{$opid}} converts echo context to params.
@@ -51,9 +51,9 @@ output-options:
       {{end}}
 
       {{if ne 0 (len .SecurityDefinitions)}}
-          var clientUID UserID
-          if clientUID, err = w.GetClientUIDFromCtx(ctx.Request().Context()); err != nil {
-              return err
+          var am domain.AuthMaterial
+          if am, err = w.GetClientAuthFromCtx(ctx.Request().Context()); err != nil {
+              return echo.NewHTTPError(http.StatusUnauthorized, "Missing or invalid apiAuthToken.")
           }
       {{end}}
 
@@ -153,7 +153,7 @@ output-options:
 
       {{end}}{{/* .RequiresParamObject */}}
           // Invoke the callback with all the unmarshalled arguments
-          err = w.Handler.{{.OperationId}}(ctx{{if ne 0 (len .SecurityDefinitions)}}, clientUID{{end}}{{genParamNames .PathParams}}{{if .RequiresParamObject}}, params{{end}})
+          err = w.Handler.{{.OperationId}}(ctx{{if ne 0 (len .SecurityDefinitions)}}, am.UID{{end}}{{genParamNames .PathParams}}{{if .RequiresParamObject}}, params{{end}})
           return err
       }
       {{end}}

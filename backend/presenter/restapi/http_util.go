@@ -3,6 +3,10 @@ package restapi
 import (
 	"context"
 	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"log"
 	"net/http"
 	"strings"
 
@@ -27,7 +31,22 @@ func parseBodyAsJSON(ctx context.Context, r *http.Request, dest interface{}) err
 	d.DisallowUnknownFields()
 
 	if err := d.Decode(dest); err != nil {
-		return Err400UndecodableJSON
+		if emsg := err.Error(); strings.HasPrefix(emsg, "email:") {
+			return echo.NewHTTPError(400, emsg)
+		}
+		if e, ok := err.(*json.UnmarshalTypeError); ok {
+			emsg := fmt.Sprintf("%s: unexpected value type (got: %s, offset: %d)", e.Field, e.Value, e.Offset)
+			return echo.NewHTTPError(400, emsg)
+		}
+		if e, ok := err.(*json.SyntaxError); ok {
+			emsg := fmt.Sprintf("%s (offset=%d)", e.Error(), e.Offset)
+			return echo.NewHTTPError(400, emsg)
+		}
+		if errors.Is(err, io.ErrUnexpectedEOF) {
+			return echo.NewHTTPError(400, err.Error())
+		}
+		log.Printf("parseBodyAsJSON(): unknown err: %#v", err)
+		return echo.NewHTTPError(400, "invalid request JSON")
 	}
 	return nil
 }

@@ -7,7 +7,7 @@ import (
 )
 
 type UserHandler struct {
-	usecase domain.UserUcase
+	usecase domain.UserUsecase
 }
 
 func fillRespUser(r *RespUser, u *domain.User) {
@@ -17,9 +17,8 @@ func fillRespUser(r *RespUser, u *domain.User) {
 	r.Id = u.ID
 }
 
-func (h UserHandler) ListUsersForAdmin(c echo.Context, clientUID UserID) error {
+func (h *UserHandler) ListUsersForAdmin(c echo.Context, clientUID UserID) error {
 	ctx := c.Request().Context()
-	c.Request().Context()
 
 	xs, err := h.usecase.List(ctx)
 	if err != nil {
@@ -31,7 +30,7 @@ func (h UserHandler) ListUsersForAdmin(c echo.Context, clientUID UserID) error {
 	})
 }
 
-func (h UserHandler) CreateUser(c echo.Context) error {
+func (h *UserHandler) CreateUser(c echo.Context) error {
 	ctx := c.Request().Context()
 
 	var b ReqCreateUser
@@ -39,26 +38,9 @@ func (h UserHandler) CreateUser(c echo.Context) error {
 		return err
 	}
 
-	u, err := h.usecase.Store(ctx, string(b.Email), b.Password, b.DisplayName)
+	u, err := h.usecase.Store(ctx, string(b.Email), b.Password, b.DisplayName, "user")
 	if err != nil {
 		return err
 	}
 	return c.JSON(200, toResp(&u, fillRespUser))
-}
-
-func (h UserHandler) CreateAuthToken(c echo.Context) error {
-	ctx := c.Request().Context()
-
-	var b ReqCreateAuthToken
-	if err := parseBodyAsJSON(ctx, c.Request(), &b); err != nil {
-		return err
-	}
-
-	tok, err := h.usecase.IssueAuthToken(ctx, string(b.Email), b.Password)
-	if err != nil {
-		return err
-	}
-	return c.JSON(200, RespAuthToken{
-		AccessToken: string(tok),
-	})
 }

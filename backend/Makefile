@@ -1,27 +1,48 @@
 .DEFAULT_GOAL   := help
 DB_SERVICE      := postgres
 REDIS_SERVICE   := redis
-GO_TEST_FLAG    := -race -shuffle=on
+GO_STRICT_TEST_FLAG    := -v -race -shuffle=on
 RED      := \033[31m
 CYAN     := \033[36m
 MAGENTA  := \033[35m
 RESET    := \033[0m
 
+# .env を読み込む（先頭のハイフンは失敗しても無視することを示す）
+-include .env
+DB_USER ?= todouser
+DB_HOST ?= 127.0.0.1
+DB_PORT ?= 25432
+MAIN_DB_NAME ?= tododb
+TEST_DB_NAME ?= $(MAIN_DB_NAME)__test
+
+# dbmate コマンドは環境変数からデータベースURLを指定できるのでその機能を使う
+export MAIN_DATABASE_URL := postgres://$(DB_USER)@$(DB_HOST):$(DB_PORT)/$(MAIN_DB_NAME)?sslmode=disable
+export TEST_DATABASE_URL := postgres://$(DB_USER)@$(DB_HOST):$(DB_PORT)/$(TEST_DB_NAME)?sslmode=disable
+export DBMATE_MIGRATIONS_DIR := _postgres/migrations
+
+export TODO_RUN_MODE   ?= debug
+export TODO_AUTH_TOKEN_MAX_AGE ?= 6h
+export TODO_ALLOW_LOCALHOST_ORIGIN ?= true
+export TODO_PGSQL_URL  ?= $(MAIN_DATABASE_URL)
+export TODO_REDIS_ADDR ?= 127.0.0.1:26379
+TODO_SERVE_PORT ?= 8181
+TODO_SERVE_HOST ?= 127.0.0.1
+
 .PHONY:	test/all
 test/all:	## Execute all tests
-	go test $(GO_TEST_FLAG) ./...
+	go test ./...
 
 .PHONY:	test/repository
 test/repository:	## Execute tests for ./repository/...
-	go test $(GO_TEST_FLAG) ./repository/...
+	go test $(GO_STRICT_TEST_FLAG) ./repository/...
 
 .PHONY:	test/domain
 test/domain:	## Execute tests for ./domain/...
-	go test $(GO_TEST_FLAG) ./domain/...
+	go test $(GO_STRICT_TEST_FLAG) ./domain/...
 
 .PHONY:	test/presenter
 test/presenter:	## Execute tests for ./presenter/...
-	go test $(GO_TEST_FLAG) ./presenter/...
+	go test $(GO_STRICT_TEST_FLAG) ./presenter/...
 
 .PHONY:	fmt
 fmt:	## Format and overwrite files
@@ -40,17 +61,6 @@ gen/from-pgsql-schema:	## Generate codes from schema.sql
 lint/go:	## Lint golang source codes
 	golangci-lint run ./...
 
-
-DB_USER ?= todouser
-DB_HOST ?= 127.0.0.1
-DB_PORT ?= 25432
-MAIN_DB_NAME ?= tododb
-TEST_DB_NAME ?= $(MAIN_DB_NAME)__test
-
-# dbmate コマンドは環境変数からデータベースURLを指定できるのでそれを使う
-export MAIN_DATABASE_URL := postgres://$(DB_USER)@$(DB_HOST):$(DB_PORT)/$(MAIN_DB_NAME)?sslmode=disable
-export TEST_DATABASE_URL := postgres://$(DB_USER)@$(DB_HOST):$(DB_PORT)/$(TEST_DB_NAME)?sslmode=disable
-export DBMATE_MIGRATIONS_DIR := _postgres/migrations
 
 .PHONY:	db/client/maindb
 db/client/maindb:	## Launch postgres client for main database
@@ -97,6 +107,15 @@ __db/migration/down:	## Revert migration
 .PHONY:	db/migration/dump
 db/migration/dump:	## Dump table schema
 	dbmate --env=MAIN_DATABASE_URL dump
+
+
+.PHONY:	api/serve
+api/serve:	## Launch api server
+	go run ./cmd/api/ serve -host $(TODO_SERVE_HOST) -port $(TODO_SERVE_PORT)
+
+.PHONY:	api/routes
+api/routes:	## Print api routes
+	go run ./cmd/api/ routes
 
 .PHONY:	help
 help:	## Show Makefile tasks

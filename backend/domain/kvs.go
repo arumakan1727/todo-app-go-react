@@ -3,7 +3,8 @@ package domain
 import "time"
 
 type KVS interface {
-	SaveAuth(ctx Ctx, a AuthToken, uid UserID, expiration time.Duration) error
-	FetchAuth(Ctx, AuthToken) (UserID, error)
+	Close()
+	SaveAuth(ctx Ctx, token AuthToken, r *AuthMaterial, expiration time.Duration) error
+	FetchAuth(Ctx, AuthToken) (AuthMaterial, error)
 	DeleteAuth(Ctx, AuthToken) error
 }

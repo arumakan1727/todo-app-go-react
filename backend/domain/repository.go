@@ -1,6 +1,8 @@
 package domain
 
 type Repository interface {
+	Close()
+
 	// BeginTx はトランザクションを開始する。
 	// すでにトランザクション中の場合は何もしない (非エラー)。
 	BeginTx(Ctx) error
@@ -10,6 +12,10 @@ type Repository interface {
 
 	// RollbackTx はトランザクションをロールバックする。
 	RollbackTx(Ctx) error
+
+	// ClearAll はリポジトリの全エントリを効率よく削除する（PostgreSQLのTRUNCATE文を使うことを想定）。
+	// 単体テスト等で使うことを想定。
+	TruncateAll(Ctx) error
 
 	StoreUser(Ctx, *User) error
 	ListUsers(Ctx) ([]User, error)

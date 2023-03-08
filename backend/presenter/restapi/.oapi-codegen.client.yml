@@ -1,13 +1,15 @@
 # available config options: https://github.com/deepmap/oapi-codegen/blob/master/pkg/codegen/configuration.go
-package: restapi
-output: schema.gen.go
+package: client
+output: client/client.gen.go
 generate:
-  models: true
+  client: true
 compatibility:
   always-prefix-enum-values: true
-additional-imports: []
+additional-imports:
+  - package: github.com/arumakan1727/todo-app-go-react/presenter/restapi
+    alias: .
 output-options:
   skip-prune: true
   user-templates:
     # see: https://github.com/deepmap/oapi-codegen/tree/master/pkg/codegen/templates
-    # request-bodies.tmpl: "// request-bodies.tmpl (empty)"
+    client-with-responses.tmpl: "// client-with-responses.tmpl (empty)"

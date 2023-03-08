@@ -11,7 +11,8 @@ import (
 )
 
 const (
-	AccessTokenScopes = "accessToken.Scopes"
+	AuthCookieScopes      = "AuthCookie.Scopes"
+	BearerAuthTokenScopes = "BearerAuthToken.Scopes"
 )
 
 // Defines values for TaskStatusFilter.
@@ -48,9 +49,9 @@ type ReqPatchTask struct {
 	Title *TaskTitle `json:"title,omitempty"`
 }
 
-// RespAuthToken defines model for RespAuthToken.
-type RespAuthToken struct {
-	AccessToken string `json:"accessToken"`
+// RespSimpleError defines model for RespSimpleError.
+type RespSimpleError struct {
+	Message string `json:"message"`
 }
 
 // RespTask defines model for RespTask.
@@ -96,10 +97,32 @@ type UserID = domain.UserID
 // Resp200Task defines model for Resp200Task.
 type Resp200Task = RespTask
 
+// Resp401MissingOrInvalidToken defines model for Resp401MissingOrInvalidToken.
+type Resp401MissingOrInvalidToken = RespSimpleError
+
+// Resp404NotFoundOrUnauthorizedOrForbidden defines model for Resp404NotFoundOrUnauthorizedOrForbidden.
+type Resp404NotFoundOrUnauthorizedOrForbidden = RespSimpleError
+
+// Resp409DuplicatedValue defines model for Resp409DuplicatedValue.
+type Resp409DuplicatedValue = RespSimpleError
+
+// RespXXXSomeError defines model for RespXXXSomeError.
+type RespXXXSomeError = RespSimpleError
+
 // ListTasksParams defines parameters for ListTasks.
 type ListTasksParams struct {
 	// Status タスクの完了状態のフィルタリング指定
 	Status *TaskStatusFilter `form:"status,omitempty" json:"status,omitempty"`
 }
 
-// request-bodies.tmpl (empty)
+// IssueAuthTokenJSONRequestBody defines body for IssueAuthToken for application/json ContentType.
+type IssueAuthTokenJSONRequestBody = ReqCreateAuthToken
+
+// CreateTaskJSONRequestBody defines body for CreateTask for application/json ContentType.
+type CreateTaskJSONRequestBody = ReqCreateTask
+
+// PatchTaskJSONRequestBody defines body for PatchTask for application/json ContentType.
+type PatchTaskJSONRequestBody = ReqPatchTask
+
+// CreateUserJSONRequestBody defines body for CreateUser for application/json ContentType.
+type CreateUserJSONRequestBody = ReqCreateUser
