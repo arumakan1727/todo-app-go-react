@@ -1,4 +1,5 @@
 .DEFAULT_GOAL   := help
+SHELL           := /bin/bash
 DB_SERVICE      := postgres
 REDIS_SERVICE   := redis
 GO_STRICT_TEST_FLAG    := -v -race -shuffle=on
@@ -81,9 +82,9 @@ db/urls:	## Show database URLs
 
 .PHONY:	db/migration/status
 db/migration/status:	## Show migration status
-	@echo "$(CYAN)### Status of '$(MAIN_DB_NAME)':$(RESET)"
+	@echo -e "$(CYAN)### Status of '$(MAIN_DB_NAME)':$(RESET)"
 	dbmate --env=MAIN_DATABASE_URL status
-	@echo "\n$(CYAN)### Status of '$(TEST_DB_NAME)':$(RESET)"
+	@echo -e "\n$(CYAN)### Status of '$(TEST_DB_NAME)':$(RESET)"
 	dbmate --env=TEST_DATABASE_URL status
 
 .PHONY:	db/migration/new
@@ -92,16 +93,16 @@ db/migration/new:	## Create migration file
 
 .PHONY:	db/migration/up
 db/migration/up:	## Apply migration
-	@echo "$(CYAN)### Applying to '$(TEST_DB_NAME)':$(RESET)"
+	@echo -e "$(CYAN)### Applying to '$(TEST_DB_NAME)':$(RESET)"
 	dbmate --env=TEST_DATABASE_URL up
-	@echo "\n$(CYAN)### Applying to '$(MAIN_DB_NAME)':$(RESET)"
+	@echo -e "\n$(CYAN)### Applying to '$(MAIN_DB_NAME)':$(RESET)"
 	dbmate --env=MAIN_DATABASE_URL up
 
 .PHONY:	__db/migration/down
 __db/migration/down:	## Revert migration
-	@echo "$(CYAN)### Reverting '$(TEST_DB_NAME)':$(RESET)"
+	@echo -e "$(CYAN)### Reverting '$(TEST_DB_NAME)':$(RESET)"
 	dbmate --env=TEST_DATABASE_URL down
-	@echo "\n$(CYAN)### Reverting '$(MAIN_DB_NAME)':$(RESET)"
+	@echo -e "\n$(CYAN)### Reverting '$(MAIN_DB_NAME)':$(RESET)"
 	dbmate --env=MAIN_DATABASE_URL down
 
 .PHONY:	db/migration/dump

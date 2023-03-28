@@ -1,4 +1,5 @@
 .DEFAULT_GOAL   := help
+SHELL    := /bin/bash
 RED      := \033[31m
 CYAN     := \033[36m
 MAGENTA  := \033[35m
