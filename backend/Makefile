@@ -88,7 +88,7 @@ db/migration/status:	## Show migration status
 
 .PHONY:	db/migration/new
 db/migration/new:	## Create migration file
-	@./scripts/new-migration.sh
+	@./_scripts/new-migration.sh
 
 .PHONY:	db/migration/up
 db/migration/up:	## Apply migration
